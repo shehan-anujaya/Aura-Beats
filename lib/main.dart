@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/theme/app_theme.dart';
-// import 'presentation/screens/onboarding/onboarding_screen.dart'; // Will implement later
+import 'presentation/screens/chat_screen.dart';
+import 'data/datasources/local_storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+  
+  // Init Hive
+  final localStorage = LocalStorageService();
+  await localStorage.init();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 700),
@@ -35,9 +40,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark, // Default to dark for "Aura"
-      home: const Scaffold(
-        body: Center(child: Text("AuraBeats Initialized")),
-      ),
+      home: const ChatScreen(),
     );
   }
 }
