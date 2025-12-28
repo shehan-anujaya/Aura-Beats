@@ -31,6 +31,7 @@ class AppTheme {
         bodyColor: Colors.white,
         displayColor: Colors.white,
       ),
+      /*
       cardTheme: CardTheme(
         color: surfaceColorDark,
         elevation: 0,
@@ -39,6 +40,7 @@ class AppTheme {
           side: const BorderSide(color: glassBorderColor, width: 1),
         ),
       ),
+      */
       iconTheme: const IconThemeData(color: Colors.white70),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
