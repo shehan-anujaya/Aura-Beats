@@ -3,9 +3,8 @@ import 'package:uuid/uuid.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/song_suggestion.dart';
 import '../../domain/repositories/ai_repository.dart';
+import '../../domain/repositories/chat_repository.dart';
 import '../providers/di_providers.dart';
-import '../providers/storage_provider.dart';
-import '../../data/datasources/local_storage_service.dart';
 
 // State class to hold chat data
 class ChatState {
@@ -49,25 +48,25 @@ class ChatState {
 
 // Notifier class
 class ChatNotifier extends Notifier<ChatState> {
-  late final AIRepository _repository;
-  late final LocalStorageService _storage;
+  late final AIRepository _aiRepository;
+  late final ChatRepository _chatRepository;
 
   @override
   ChatState build() {
-    _repository = ref.read(aiRepositoryProvider);
-    _storage = ref.read(localStorageProvider);
+    _aiRepository = ref.read(aiRepositoryProvider);
+    _chatRepository = ref.read(chatRepositoryProvider);
     
-    // Load history
-    final history = _storage.getChatHistory();
-    if (history.isNotEmpty) {
-      return ChatState(
-        messages: history,
-        isLoading: false,
-        suggestions: [],
-      );
-    }
+    _loadHistory();
     
+    // Return initial state temporarily, will update async
     return ChatState.initial();
+  }
+
+  Future<void> _loadHistory() async {
+    final history = await _chatRepository.getHistory();
+    if (history.isNotEmpty) {
+      state = state.copyWith(messages: history);
+    }
   }
 
   Future<void> sendMessage(String text) async {
@@ -86,11 +85,11 @@ class ChatNotifier extends Notifier<ChatState> {
       messages: newMessages,
       isLoading: true,
     );
-    await _storage.saveChatHistory(newMessages);
+    await _chatRepository.saveMessage(userMsg);
 
     // Analyze and Get Suggestions
     try {
-      final suggestions = await _repository.getSongSuggestions(text, state.messages);
+      final suggestions = await _aiRepository.getSongSuggestions(text, state.messages);
 
       if (suggestions.isNotEmpty) {
         final aiMsg = ChatMessage(
@@ -106,7 +105,7 @@ class ChatNotifier extends Notifier<ChatState> {
           suggestions: suggestions,
           messages: updatedMessages,
         );
-        await _storage.saveChatHistory(updatedMessages);
+        await _chatRepository.saveMessage(aiMsg);
       } else {
         final aiMsg = ChatMessage(
           id: const Uuid().v4(),
@@ -120,12 +119,12 @@ class ChatNotifier extends Notifier<ChatState> {
           isLoading: false,
           messages: updatedMessages,
         );
-        await _storage.saveChatHistory(updatedMessages);
+        await _chatRepository.saveMessage(aiMsg);
       }
     } catch (e) {
       final errorMsg = ChatMessage(
         id: const Uuid().v4(),
-        content: "I had trouble connecting to my inner senses (Ollama). Is it running?",
+        content: "I had trouble connecting to my inner senses (Ollama). Is it running? Error: $e",
         isUser: false,
         timestamp: DateTime.now(),
       );
@@ -135,13 +134,14 @@ class ChatNotifier extends Notifier<ChatState> {
         isLoading: false,
         messages: updatedMessages,
       );
-      await _storage.saveChatHistory(updatedMessages);
+      // Don't save error messages to history maybe? Or yes to show context.
+      await _chatRepository.saveMessage(errorMsg);
     }
   }
   
-  void reset() {
+  Future<void> reset() async {
     state = ChatState.initial();
-    _storage.clearHistory();
+    await _chatRepository.clearHistory();
   }
 }
 
