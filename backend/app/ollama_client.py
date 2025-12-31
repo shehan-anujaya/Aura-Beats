@@ -4,7 +4,7 @@ import json
 class OllamaClient:
     def __init__(self, base_url="http://localhost:11434/api"):
         self.base_url = base_url
-        self.model = "qwen2.5:3b"
+        self.model = "qwen3:8b"
 
     async def check_connection(self):
         try:

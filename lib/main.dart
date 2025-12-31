@@ -3,15 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/chat_screen.dart';
-import 'data/datasources/local_storage_service.dart';
+import 'core/di/injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
   
-  // Init Hive
-  final localStorage = LocalStorageService();
-  await localStorage.init();
+  // Init DI
+  await di.init();
+  
+  // Init Hive via DI
+  await di.sl<LocalStorageService>().init();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 700),

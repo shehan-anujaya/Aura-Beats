@@ -1,34 +1,34 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/datasources/remote/ollama_service.dart';
-import '../../data/datasources/local_storage_service.dart';
-import '../../data/repositories/ai_repository_impl.dart';
-import '../../data/repositories/chat_repository_impl.dart';
+import '../../core/di/injection_container.dart';
+import '../../domain/usecases/get_song_suggestions.dart';
+import '../../domain/usecases/get_chat_history.dart';
+import '../../domain/usecases/save_chat_message.dart';
+import '../../domain/usecases/clear_chat_history.dart';
 import '../../domain/repositories/ai_repository.dart';
 import '../../domain/repositories/chat_repository.dart';
 
-// Framework/External Services
-final dioProvider = Provider<Dio>((ref) {
-  return Dio();
+// Use Cases
+final getSongSuggestionsProvider = Provider<GetSongSuggestions>((ref) {
+  return sl<GetSongSuggestions>();
 });
 
-final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
-  return LocalStorageService();
+final getChatHistoryProvider = Provider<GetChatHistory>((ref) {
+  return sl<GetChatHistory>();
 });
 
-// Data Sources
-final ollamaServiceProvider = Provider<OllamaService>((ref) {
-  final dio = ref.watch(dioProvider);
-  return OllamaService(dio);
+final saveChatMessageProvider = Provider<SaveChatMessage>((ref) {
+  return sl<SaveChatMessage>();
 });
 
-// Repositories
+final clearChatHistoryProvider = Provider<ClearChatHistory>((ref) {
+  return sl<ClearChatHistory>();
+});
+
+// Repositories (if still needed directly)
 final aiRepositoryProvider = Provider<AIRepository>((ref) {
-  final ollamaService = ref.watch(ollamaServiceProvider);
-  return AIRepositoryImpl(ollamaService);
+  return sl<AIRepository>();
 });
 
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
-  final localStorage = ref.watch(localStorageServiceProvider);
-  return ChatRepositoryImpl(localStorage);
+  return sl<ChatRepository>();
 });
