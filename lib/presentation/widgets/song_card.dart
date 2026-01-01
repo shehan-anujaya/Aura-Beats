@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/song_suggestion.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/audio_player_provider.dart';
 import 'glass_container.dart';
 
 class SongCard extends ConsumerWidget {
@@ -15,7 +16,8 @@ class SongCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLiked = ref.watch(favoritesProvider.notifier).isFavorite(song);
-    ref.watch(favoritesProvider); // Rebuild when favorites change
+    final audioState = ref.watch(audioPlaybackProvider);
+    final isThisPlaying = audioState.playingUrl == song.previewUrl && audioState.isPlaying;
 
     return Container(
       width: 220,
@@ -27,32 +29,60 @@ class SongCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Album Art Placeholder (Gradient)
+            // Album Art / Media Section
             Expanded(
-              flex: 3,
+              flex: 4,
               child: Stack(
                 children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                      child: song.imageUrl != null
+                          ? Image.network(
+                              song.imageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                            )
+                          : _buildPlaceholder(),
+                    ),
+                  ),
+                  // Dark overlay for controls
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                           colors: [
-                            Colors.purpleAccent.withOpacity(0.4),
-                            Colors.blueAccent.withOpacity(0.4),
+                            Colors.black.withOpacity(0.2),
+                            Colors.black.withOpacity(0.5),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(Icons.music_note, size: 48, color: Colors.white.withOpacity(0.5)),
                       ),
                     ),
                   ),
+                  // Play/Pause Button
+                  if (song.previewUrl != null)
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                          child: Icon(
+                            isThisPlaying ? Icons.pause : Icons.play_arrow,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                   // Like Button
                   Positioned(
                     top: 12,
@@ -138,6 +168,24 @@ class SongCard extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.purpleAccent.withOpacity(0.4),
+            Colors.blueAccent.withOpacity(0.4),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(Icons.music_note, size: 48, color: Colors.white.withOpacity(0.5)),
       ),
     );
   }

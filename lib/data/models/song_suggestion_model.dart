@@ -2,26 +2,24 @@ import '../../domain/entities/song_suggestion.dart';
 
 class SongSuggestionModel extends SongSuggestion {
   const SongSuggestionModel({
-    required String title,
-    required String artist,
-    required String genre,
-    required String mood,
-    required String reason,
-  }) : super(
-          title: title,
-          artist: artist,
-          genre: genre,
-          mood: mood,
-          reason: reason,
-        );
+    required super.title,
+    required super.artist,
+    required super.genre,
+    required super.mood,
+    required super.reason,
+    super.imageUrl,
+    super.previewUrl,
+  });
 
   factory SongSuggestionModel.fromJson(Map<String, dynamic> json) {
     return SongSuggestionModel(
-      title: json['title'] ?? 'Unknown Title',
-      artist: json['artist'] ?? 'Unknown Artist',
-      genre: json['genre'] ?? 'Unknown Genre',
-      mood: json['mood'] ?? 'General',
-      reason: json['reason'] ?? '',
+      title: json['title'],
+      artist: json['artist'],
+      genre: json['genre'],
+      mood: json['mood'],
+      reason: json['reason'],
+      imageUrl: json['imageUrl'],
+      previewUrl: json['previewUrl'],
     );
   }
 
@@ -32,6 +30,8 @@ class SongSuggestionModel extends SongSuggestion {
       'genre': genre,
       'mood': mood,
       'reason': reason,
+      'imageUrl': imageUrl,
+      'previewUrl': previewUrl,
     };
   }
 }

@@ -6,6 +6,8 @@ class SongSuggestion extends Equatable {
   final String genre;
   final String mood;
   final String reason;
+  final String? imageUrl;
+  final String? previewUrl;
 
   const SongSuggestion({
     required this.title,
@@ -13,10 +15,12 @@ class SongSuggestion extends Equatable {
     required this.genre,
     required this.mood,
     required this.reason,
+    this.imageUrl,
+    this.previewUrl,
   });
 
   @override
-  List<Object?> get props => [title, artist, genre, mood, reason];
+  List<Object?> get props => [title, artist, genre, mood, reason, imageUrl, previewUrl];
 
   // Helper to parse from typical JSON format
   factory SongSuggestion.fromJson(Map<String, dynamic> json) {
