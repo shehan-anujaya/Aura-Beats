@@ -3,24 +3,32 @@ import 'package:audioplayers/audioplayers.dart';
 
 class AudioPlaybackState {
   final String? playingUrl;
+  final String? currentMood;
   final bool isPlaying;
   final bool isLoading;
+  final bool hasJustFinished;
 
   AudioPlaybackState({
     this.playingUrl,
+    this.currentMood,
     this.isPlaying = false,
     this.isLoading = false,
+    this.hasJustFinished = false,
   });
 
   AudioPlaybackState copyWith({
     String? playingUrl,
+    String? currentMood,
     bool? isPlaying,
     bool? isLoading,
+    bool? hasJustFinished,
   }) {
     return AudioPlaybackState(
       playingUrl: playingUrl ?? this.playingUrl,
+      currentMood: currentMood ?? this.currentMood,
       isPlaying: isPlaying ?? this.isPlaying,
       isLoading: isLoading ?? this.isLoading,
+      hasJustFinished: hasJustFinished ?? this.hasJustFinished,
     );
   }
 }
@@ -34,11 +42,13 @@ class AudioPlayerNotifier extends Notifier<AudioPlaybackState> {
     
     _player.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.completed) {
-        this.state = this.state.copyWith(isPlaying: false);
+        this.state = this.state.copyWith(
+          isPlaying: false,
+          hasJustFinished: true,
+        );
       }
     });
 
-    // Cleanup when provider is disposed
     ref.onDispose(() {
       _player.dispose();
     });
@@ -46,7 +56,7 @@ class AudioPlayerNotifier extends Notifier<AudioPlaybackState> {
     return AudioPlaybackState();
   }
 
-  Future<void> playPreview(String url) async {
+  Future<void> playPreview(String url, String mood) async {
     if (state.playingUrl == url && state.isPlaying) {
       await _player.pause();
       state = state.copyWith(isPlaying: false);
@@ -54,7 +64,12 @@ class AudioPlayerNotifier extends Notifier<AudioPlaybackState> {
     }
 
     try {
-      state = state.copyWith(isLoading: true, playingUrl: url);
+      state = state.copyWith(
+        isLoading: true, 
+        playingUrl: url, 
+        currentMood: mood,
+        hasJustFinished: false,
+      );
       await _player.stop();
       await _player.play(UrlSource(url));
       state = state.copyWith(isPlaying: true, isLoading: false);
@@ -64,9 +79,13 @@ class AudioPlayerNotifier extends Notifier<AudioPlaybackState> {
     }
   }
 
+  void resetFinished() {
+    state = state.copyWith(hasJustFinished: false);
+  }
+
   Future<void> stop() async {
     await _player.stop();
-    state = state.copyWith(isPlaying: false, playingUrl: null);
+    state = state.copyWith(isPlaying: false, playingUrl: null, currentMood: null);
   }
 }
 

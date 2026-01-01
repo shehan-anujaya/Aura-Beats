@@ -68,7 +68,7 @@ class SongCard extends ConsumerWidget {
                   if (song.previewUrl != null)
                     Center(
                       child: GestureDetector(
-                        onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!),
+                        onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!, song.mood),
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
