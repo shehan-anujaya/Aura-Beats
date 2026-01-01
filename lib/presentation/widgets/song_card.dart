@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/song_suggestion.dart';
+import '../providers/favorites_provider.dart';
 import 'glass_container.dart';
 
 class SongCard extends StatelessWidget {
@@ -16,6 +18,19 @@ class SongCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+class SongCard extends ConsumerWidget {
+  final SongSuggestion song;
+
+  const SongCard({
+    super.key,
+    required this.song,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLiked = ref.watch(favoritesProvider.notifier).isFavorite(song);
+    ref.watch(favoritesProvider); // Rebuild when favorites change
+
     return Container(
       width: 220,
       margin: const EdgeInsets.only(right: 16, bottom: 8, top: 8),
@@ -29,21 +44,50 @@ class SongCard extends StatelessWidget {
             // Album Art Placeholder (Gradient)
             Expanded(
               flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.purpleAccent.withOpacity(0.4), Colors.blueAccent.withOpacity(0.4)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.purpleAccent.withOpacity(0.4),
+                            Colors.blueAccent.withOpacity(0.4),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(Icons.music_note, size: 48, color: Colors.white.withOpacity(0.5)),
+                      ),
+                    ),
                   ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
+                  // Like Button
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(song),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black.withOpacity(0.3),
+                        ),
+                        child: Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          size: 18,
+                          color: isLiked ? Colors.redAccent : Colors.white70,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Icon(Icons.music_note, size: 48, color: Colors.white.withOpacity(0.5)),
-                ),
+                ],
               ),
             ),
             // Details
@@ -63,32 +107,36 @@ class SongCard extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 15,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           song.artist,
                           style: const TextStyle(
                             color: Colors.white70,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            song.mood,
-                            style: const TextStyle(color: Colors.cyanAccent, fontSize: 10),
-                          ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                song.genre,
+                                style: const TextStyle(color: Colors.white38, fontSize: 9),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

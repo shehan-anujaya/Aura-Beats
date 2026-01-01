@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_theme.dart';
 import '../controllers/chat_controller.dart';
+import '../providers/connectivity_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/song_card.dart';
+import '../widgets/custom_title_bar.dart';
+import 'favorites_screen.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -50,22 +53,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text("AuraBeats"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(chatProvider.notifier).reset(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // TODO: Navigate to settings
-            },
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           // Dynamic Gradient Background
@@ -83,25 +70,65 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           
-          // Subtle Animated Glows (Simulated with Containers)
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.primaryColor.withOpacity(0.15),
-              ),
-            ).animate(onPlay: (controller) => controller.repeat())
-             .moveY(begin: 0, end: 50, duration: 4.seconds, curve: Curves.easeInOut)
-             .then()
-             .moveY(begin: 50, end: 0, duration: 4.seconds, curve: Curves.easeInOut),
-          ),
-
           Column(
             children: [
+              CustomTitleBar(
+                actions: [
+                  // Connectivity Indicator
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final isConnected = ref.watch(backendConnectivityProvider);
+                      return Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isConnected ? Colors.greenAccent : Colors.redAccent,
+                              boxShadow: [
+                                if (isConnected)
+                                  BoxShadow(
+                                    color: Colors.greenAccent.withOpacity(0.5),
+                                    blurRadius: 4,
+                                    spreadRadius: 1,
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isConnected ? "Aura Online" : "Aura Offline",
+                            style: TextStyle(
+                              color: isConnected ? Colors.greenAccent.withOpacity(0.7) : Colors.redAccent.withOpacity(0.7),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.favorite, size: 20, color: Colors.white70),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+                      );
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 20, color: Colors.white70),
+                    onPressed: () => ref.read(chatProvider.notifier).reset(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
