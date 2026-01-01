@@ -3,15 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../../core/di/injection_container.dart';
 
-final backendConnectivityProvider = StateNotifierProvider<ConnectivityNotifier, bool>((ref) {
-  return ConnectivityNotifier();
-});
-
-class ConnectivityNotifier extends StateNotifier<bool> {
+class ConnectivityNotifier extends Notifier<bool> {
   Timer? _timer;
-  final Dio _dio = sl<Dio>();
+  late final Dio _dio;
 
-  ConnectivityNotifier() : super(false) {
+  @override
+  bool build() {
+    _dio = sl<Dio>();
+    _startTimer();
+    return false; // Initial state
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
     _statusCheck();
     _timer = Timer.periodic(const Duration(seconds: 10), (_) => _statusCheck());
   }
@@ -25,11 +29,9 @@ class ConnectivityNotifier extends StateNotifier<bool> {
     }
   }
 
-  @override
-  void dispose() {
+  void stop() {
     _timer?.cancel();
-    // Some versions of StateNotifier may not have a dispose method to override or call super on.
-    // If you are using a version where super.dispose() is required, uncomment it.
-    // super.dispose();
   }
 }
+
+final backendConnectivityProvider = NotifierProvider<ConnectivityNotifier, bool>(ConnectivityNotifier.new);

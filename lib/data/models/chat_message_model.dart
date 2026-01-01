@@ -1,17 +1,9 @@
-import 'package:hive/hive.dart';
 import '../../domain/entities/chat_message.dart';
 
-part 'chat_message_model.g.dart';
-
-@HiveType(typeId: 0)
 class ChatMessageModel extends ChatMessage {
-  @HiveField(0)
   final String id;
-  @HiveField(1)
   final String content;
-  @HiveField(2)
   final bool isUser;
-  @HiveField(3)
   final DateTime timestamp;
 
   ChatMessageModel({
