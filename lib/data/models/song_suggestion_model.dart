@@ -11,6 +11,18 @@ class SongSuggestionModel extends SongSuggestion {
     super.previewUrl,
   });
 
+  factory SongSuggestionModel.fromEntity(SongSuggestion song) {
+    return SongSuggestionModel(
+      title: song.title,
+      artist: song.artist,
+      genre: song.genre,
+      mood: song.mood,
+      reason: song.reason,
+      imageUrl: song.imageUrl,
+      previewUrl: song.previewUrl,
+    );
+  }
+
   factory SongSuggestionModel.fromJson(Map<String, dynamic> json) {
     return SongSuggestionModel(
       title: json['title'],
