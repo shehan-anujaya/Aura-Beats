@@ -222,25 +222,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ).animate().scale(curve: Curves.elasticOut, duration: 600.ms).fade(),
                 ),
 
-              // Suggestions View
-              if (chatState.suggestions.isNotEmpty)
-                Container(
-                  height: 260,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: chatState.suggestions.length,
-                    itemBuilder: (context, index) {
-                      final song = chatState.suggestions[index];
-                      return SongCard(song: song)
-                          .animate(delay: Duration(milliseconds: index * 100))
-                          .fade(duration: 500.ms)
-                          .slideX(begin: 0.2, end: 0);
-                    },
-                  ),
-                ),
-
               // Input Area
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),

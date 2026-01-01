@@ -12,12 +12,10 @@ import '../providers/di_providers.dart';
 class ChatState {
   final List<ChatMessage> messages;
   final bool isLoading;
-  final List<SongSuggestion> suggestions;
 
   ChatState({
     required this.messages,
     required this.isLoading,
-    required this.suggestions,
   });
 
   factory ChatState.initial() {
@@ -31,19 +29,16 @@ class ChatState {
         ),
       ],
       isLoading: false,
-      suggestions: [],
     );
   }
 
   ChatState copyWith({
     List<ChatMessage>? messages,
     bool? isLoading,
-    List<SongSuggestion>? suggestions,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
-      suggestions: suggestions ?? this.suggestions,
     );
   }
 }
@@ -64,7 +59,6 @@ class ChatNotifier extends Notifier<ChatState> {
     
     _loadHistory();
     
-    // Return initial state temporarily, will update async
     return ChatState.initial();
   }
 
@@ -103,12 +97,12 @@ class ChatNotifier extends Notifier<ChatState> {
           content: "I've found some tracks that match your vibe.",
           isUser: false,
           timestamp: DateTime.now(),
+          suggestions: suggestions,
         );
-        final updatedMessages = [...newMessages, aiMsg];
+        final updatedMessages = [...state.messages, aiMsg];
         
         state = state.copyWith(
           isLoading: false,
-          suggestions: suggestions,
           messages: updatedMessages,
         );
         await _saveChatMessage.execute(aiMsg);
@@ -119,7 +113,7 @@ class ChatNotifier extends Notifier<ChatState> {
           isUser: false,
           timestamp: DateTime.now(),
         );
-        final updatedMessages = [...newMessages, aiMsg];
+        final updatedMessages = [...state.messages, aiMsg];
         
         state = state.copyWith(
           isLoading: false,
@@ -134,7 +128,7 @@ class ChatNotifier extends Notifier<ChatState> {
         isUser: false,
         timestamp: DateTime.now(),
       );
-      final updatedMessages = [...newMessages, errorMsg];
+      final updatedMessages = [...state.messages, errorMsg];
       
       state = state.copyWith(
         isLoading: false,
@@ -145,8 +139,8 @@ class ChatNotifier extends Notifier<ChatState> {
   }
   
   Future<void> reset() async {
-    state = ChatState.initial();
     await _clearChatHistory.execute();
+    state = ChatState.initial();
   }
 }
 
