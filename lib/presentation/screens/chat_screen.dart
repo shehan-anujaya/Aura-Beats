@@ -55,19 +55,61 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Dynamic Gradient Background
-          Container(
-            decoration: const BoxDecoration(
+  Color _getMoodColor(String? mood) {
+    if (mood == null) return const Color(0xFF0F0C29);
+    final m = mood.toLowerCase();
+    if (m.contains('calm') || m.contains('peaceful')) return const Color(0xFF1A237E);
+    if (m.contains('energ') || m.contains('happ') || m.contains('upbeat')) return const Color(0xFF880E4F);
+    if (m.contains('sad') || m.contains('melancholy') || m.contains('lonely')) return const Color(0xFF263238);
+    if (m.contains('relax') || m.contains('chill')) return const Color(0xFF004D40);
+    return const Color(0xFF0F0C29);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final chatState = ref.watch(chatProvider);
+    final audioState = ref.watch(audioPlaybackProvider);
+
+    // Auto-scroll on new message
+    ref.listen(chatProvider, (previous, next) {
+      if (next.messages.length > (previous?.messages.length ?? 0)) {
+        _scrollToBottom();
+      }
+    });
+
+    final moodColor = _getMoodColor(audioState.currentMood);
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Dynamic Gradient Background with Mood Pulse
+          AnimatedContainer(
+            duration: const Duration(seconds: 2),
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF0F0C29),
-                  Color(0xFF302B63),
-                  Color(0xFF24243E),
+                  moodColor,
+                  audioState.isPlaying ? moodColor.withOpacity(0.8) : const Color(0xFF302B63),
+                  const Color(0xFF24243E),
                 ],
               ),
             ),
+            child: audioState.isPlaying 
+              ? Center(
+                  child: Container(
+                    width: 400,
+                    height: 400,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: moodColor.withOpacity(0.1),
+                    ),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                   .scale(begin: const Offset(1, 1), end: const Offset(1.5, 1.5), duration: 3.seconds, curve: Curves.easeInOut)
+                   .blur(begin: const Offset(50, 50), end: const Offset(100, 100))
+                )
+              : null,
           ),
           
           Column(
@@ -144,6 +186,56 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
               ),
               
+              // Mood Check-in Overlay
+              if (audioState.hasJustFinished)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: GlassContainer(
+                    padding: const EdgeInsets.all(16),
+                    borderRadius: BorderRadius.circular(24),
+                    color: AppTheme.primaryColor.withOpacity(0.15),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Aura sensed the vibe. How are you feeling now?",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _MoodButton(
+                              label: "Better", 
+                              icon: Icons.wb_sunny_outlined,
+                              onTap: () {
+                                ref.read(chatProvider.notifier).sendMessage("I feel better, thanks!");
+                                ref.read(audioPlaybackProvider.notifier).resetFinished();
+                              },
+                            ),
+                            _MoodButton(
+                              label: "Still Same", 
+                              icon: Icons.filter_drama_outlined,
+                              onTap: () {
+                                ref.read(chatProvider.notifier).sendMessage("It's nice, but I'm still feeling a bit the same.");
+                                ref.read(audioPlaybackProvider.notifier).resetFinished();
+                              },
+                            ),
+                            _MoodButton(
+                              label: "Different Vibe", 
+                              icon: Icons.auto_awesome_mosaic_outlined,
+                              onTap: () {
+                                ref.read(chatProvider.notifier).sendMessage("Can we try a different vibe?");
+                                ref.read(audioPlaybackProvider.notifier).resetFinished();
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ).animate().scale(curve: Curves.elasticOut, duration: 600.ms).fade(),
+                ),
+
               // Suggestions View
               if (chatState.suggestions.isNotEmpty)
                 Container(
@@ -221,5 +313,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
     );
+  }
+}
+
+class _MoodButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _MoodButton({required this.label, required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.1),
+            ),
+            child: Icon(icon, size: 20, color: Colors.white70),
+          ),
+          const SizedBox(height: 6),
+          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
   }
 }
