@@ -4,20 +4,6 @@ import '../../domain/entities/song_suggestion.dart';
 import '../providers/favorites_provider.dart';
 import 'glass_container.dart';
 
-class SongCard extends StatelessWidget {
-  final SongSuggestion song;
-  final VoidCallback? onPlay;
-  final VoidCallback? onLike;
-
-  const SongCard({
-    super.key,
-    required this.song,
-    this.onPlay,
-    this.onLike,
-  });
-
-  @override
-  Widget build(BuildContext context) {
 class SongCard extends ConsumerWidget {
   final SongSuggestion song;
 

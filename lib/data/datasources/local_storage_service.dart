@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/chat_message_model.dart';
+import '../models/song_suggestion_model.dart';
 
 class LocalStorageService {
   static const String boxName = 'aura_data';

@@ -28,6 +28,8 @@ class ConnectivityNotifier extends StateNotifier<bool> {
   @override
   void dispose() {
     _timer?.cancel();
-    super.dispose();
+    // Some versions of StateNotifier may not have a dispose method to override or call super on.
+    // If you are using a version where super.dispose() is required, uncomment it.
+    // super.dispose();
   }
 }
