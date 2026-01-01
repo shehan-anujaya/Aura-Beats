@@ -31,7 +31,7 @@ class SongCard extends ConsumerWidget {
           children: [
             // Album Art / Media Section
             Expanded(
-              flex: 4,
+              flex: 3,
               child: Stack(
                 children: [
                   Positioned.fill(

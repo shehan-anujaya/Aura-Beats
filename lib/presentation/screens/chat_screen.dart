@@ -147,7 +147,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               // Suggestions View
               if (chatState.suggestions.isNotEmpty)
                 Container(
-                  height: 220,
+                  height: 260,
                   margin: const EdgeInsets.only(bottom: 16),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
