@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_theme.dart';
 import '../controllers/chat_controller.dart';
 import '../providers/connectivity_provider.dart';
+import '../providers/audio_player_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/song_card.dart';
@@ -29,7 +30,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    // Small delay to let the list build
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -41,20 +41,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final chatState = ref.watch(chatProvider);
-
-    // Auto-scroll on new message
-    ref.listen(chatProvider, (previous, next) {
-      if (next.messages.length > (previous?.messages.length ?? 0)) {
-        _scrollToBottom();
-      }
-    });
-
-    return Scaffold(
-      body: Stack(
-        children: [
   Color _getMoodColor(String? mood) {
     if (mood == null) return const Color(0xFF0F0C29);
     final m = mood.toLowerCase();
@@ -340,5 +326,8 @@ class _MoodButton extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+        ],
+      ),
+    );
   }
 }
