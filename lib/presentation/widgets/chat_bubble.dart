@@ -27,19 +27,33 @@ class ChatBubble extends StatelessWidget {
   Widget _buildUserBubble(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(0),
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primaryColor,
+            AppTheme.primaryColor.withBlue(255),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(4),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Text(
         message.content,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -47,15 +61,17 @@ class ChatBubble extends StatelessWidget {
   Widget _buildAIBubble(BuildContext context) {
     return GlassContainer(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
-        bottomLeft: Radius.circular(0),
-        bottomRight: Radius.circular(16),
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+        bottomLeft: Radius.circular(4),
+        bottomRight: Radius.circular(20),
       ),
+      blur: 15,
       child: Text(
         message.content,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white, height: 1.4),
       ),
     );
   }

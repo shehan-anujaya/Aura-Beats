@@ -66,94 +66,132 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage("https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2670&auto=format&fit=crop"), // Placeholder abstract bg
-            fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          // Dynamic Gradient Background
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF0F0C29),
+                  Color(0xFF302B63),
+                  Color(0xFF24243E),
+                ],
+              ),
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            // Dark Overlay
-            Container(color: Colors.black.withOpacity(0.6)),
-            
-            Column(
-              children: [
-                Expanded(
+          
+          // Subtle Animated Glows (Simulated with Containers)
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.primaryColor.withOpacity(0.15),
+              ),
+            ).animate(onPlay: (controller) => controller.repeat())
+             .moveY(begin: 0, end: 50, duration: 4.seconds, curve: Curves.easeInOut)
+             .then()
+             .moveY(begin: 50, end: 0, duration: 4.seconds, curve: Curves.easeInOut),
+          ),
+
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 120, 16, 16),
+                  itemCount: chatState.messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = chatState.messages[index];
+                    return ChatBubble(message: msg)
+                        .animate()
+                        .fade(duration: 400.ms)
+                        .slideY(begin: 0.2, end: 0);
+                  },
+                ),
+              ),
+              
+              // Suggestions View
+              if (chatState.suggestions.isNotEmpty)
+                Container(
+                  height: 220,
+                  margin: const EdgeInsets.only(bottom: 16),
                   child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 100, 16, 16),
-                    itemCount: chatState.messages.length,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: chatState.suggestions.length,
                     itemBuilder: (context, index) {
-                      final msg = chatState.messages[index];
-                      return ChatBubble(message: msg);
+                      final song = chatState.suggestions[index];
+                      return SongCard(song: song)
+                          .animate(delay: Duration(milliseconds: index * 100))
+                          .fade(duration: 500.ms)
+                          .slideX(begin: 0.2, end: 0);
                     },
                   ),
                 ),
-                
-                // Suggestions View (Horizontal List if available)
-                if (chatState.suggestions.isNotEmpty)
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: chatState.suggestions.length,
-                      itemBuilder: (context, index) {
-                        final song = chatState.suggestions[index];
-                        return SongCard(song: song)
-                            .animate(delay: Duration(milliseconds: index * 100))
-                            .fade(duration: 500.ms)
-                            .slideX(begin: 0.2, end: 0);
-                      },
-                    ),
-                  ),
 
-                // Input Area
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: GlassContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _textController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: const InputDecoration(
-                              hintText: "Tell me how you feel...",
-                              hintStyle: TextStyle(color: Colors.white54),
-                              border: InputBorder.none,
-                            ),
-                            onSubmitted: (value) {
+              // Input Area
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                child: GlassContainer(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  borderRadius: BorderRadius.circular(32),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _textController,
+                          style: const TextStyle(color: Colors.white, fontSize: 15),
+                          decoration: const InputDecoration(
+                            hintText: "How's your heart feeling today?",
+                            hintStyle: TextStyle(color: Colors.white38),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          onSubmitted: (value) {
+                            if (value.trim().isNotEmpty) {
                               ref.read(chatProvider.notifier).sendMessage(value);
                               _textController.clear();
-                            },
-                          ),
+                            }
+                          },
                         ),
-                        if (chatState.isLoading)
-                          const SizedBox(
+                      ),
+                      const SizedBox(width: 8),
+                      if (chatState.isLoading)
+                        const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        else
-                          IconButton(
-                            icon: const Icon(Icons.send, color: AppTheme.primaryColor),
-                            onPressed: () {
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                            ),
+                          ),
+                        )
+                      else
+                        IconButton(
+                          icon: const Icon(Icons.auto_awesome, color: AppTheme.primaryColor),
+                          onPressed: () {
+                            if (_textController.text.trim().isNotEmpty) {
                               ref.read(chatProvider.notifier).sendMessage(_textController.text);
                               _textController.clear();
-                            },
-                          ),
-                      ],
-                    ),
+                            }
+                          },
+                        ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
