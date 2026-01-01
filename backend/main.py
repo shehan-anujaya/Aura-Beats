@@ -19,6 +19,8 @@ class SuggestionRequest(BaseModel):
 async def health_check():
     return {"status": "ok", "ollama_connected": await ollama_client.check_connection()}
 
+import traceback
+
 @app.post("/suggestions")
 async def get_suggestions(request: SuggestionRequest):
     try:
@@ -28,6 +30,8 @@ async def get_suggestions(request: SuggestionRequest):
         )
         return {"suggestions": suggestions}
     except Exception as e:
+        print(f"ERROR in get_suggestions: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

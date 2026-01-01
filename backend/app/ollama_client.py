@@ -56,17 +56,39 @@ class OllamaClient:
                     elif "```" in content:
                         content = content.split("```")[1].split("```")[0].strip()
                     
-                    suggestions = json.loads(content)
+                    data = json.loads(content)
+                    
+                    # Handle cases where AI wraps the list in an object
+                    if isinstance(data, dict):
+                        if "suggestions" in data:
+                            suggestions = data["suggestions"]
+                        elif "songs" in data:
+                            suggestions = data["songs"]
+                        else:
+                            # If it's a dict but no obvious key, maybe it's a single suggestion?
+                            suggestions = [data]
+                    else:
+                        suggestions = data
+
+                    if not isinstance(suggestions, list):
+                        raise Exception(f"AI returned invalid format: expected list, got {type(suggestions)}")
                     
                     # Enrich with media metadata
                     enriched_suggestions = []
                     tasks = []
-                    for s in suggestions:
-                        tasks.append(self.music_service.find_song_metadata(s["title"], s["artist"]))
+                    valid_suggestions = []
                     
+                    for s in suggestions:
+                        if isinstance(s, dict) and "title" in s and "artist" in s:
+                            tasks.append(self.music_service.find_song_metadata(s["title"], s["artist"]))
+                            valid_suggestions.append(s)
+                    
+                    if not tasks:
+                        return []
+
                     metadata_results = await asyncio.gather(*tasks)
                     
-                    for s, meta in zip(suggestions, metadata_results):
+                    for s, meta in zip(valid_suggestions, metadata_results):
                         s["imageUrl"] = meta["imageUrl"]
                         s["previewUrl"] = meta["previewUrl"]
                         enriched_suggestions.append(s)
