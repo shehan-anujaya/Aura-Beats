@@ -29,20 +29,24 @@ void main() async {
     await windowManager.focus();
   });
 
+import 'presentation/providers/theme_provider.dart';
+
+void main() async {
+  // ... existing init ...
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+
     return MaterialApp(
       title: 'AuraBeats',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Default to dark for "Aura"
+      theme: AppTheme.getTheme(themeMode),
       home: const ChatScreen(),
     );
   }

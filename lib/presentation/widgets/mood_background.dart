@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/theme_provider.dart';
 
 enum MoodType { love, sad, happy, chill, energetic, none }
 
-class MoodBackground extends StatelessWidget {
+class MoodBackground extends ConsumerWidget {
   final MoodType mood;
   final bool isPlaying;
   final Widget child;
@@ -17,11 +19,14 @@ class MoodBackground extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isSpotify = themeMode == AuraThemeMode.spotify;
+
     return Stack(
       children: [
-        Positioned.fill(child: _BaseBackground(mood: mood, isPlaying: isPlaying)),
-        if (isPlaying) Positioned.fill(child: _MoodOverlay(mood: mood)),
+        Positioned.fill(child: _BaseBackground(mood: mood, isPlaying: isPlaying, themeMode: themeMode)),
+        if (isPlaying && !isSpotify) Positioned.fill(child: _MoodOverlay(mood: mood)),
         child,
       ],
     );

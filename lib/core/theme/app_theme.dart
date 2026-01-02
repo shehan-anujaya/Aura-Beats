@@ -2,32 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Brand Colors - Premium Curated Palette
-  static const Color primaryColor = Color(0xFF818CF8); // Indigo 400
-  static const Color primaryDark = Color(0xFF4F46E5); // Indigo 600
-  static const Color secondaryColor = Color(0xFF2DD4BF); // Teal 400
-  static const Color backgroundColorDark = Color(0xFF0F172A); // Slate 900
-  static const Color surfaceColorDark = Color(0xFF1E293B); // Slate 800
-  static const Color accentColor = Color(0xFFF472B6); // Pink 400
+  // Aura Theme Colors
+  static const Color auraPrimary = Color(0xFF818CF8);
+  static const Color auraPrimaryDark = Color(0xFF4F46E5);
+  static const Color auraBackground = Color(0xFF0F172A);
+  static const Color auraSurface = Color(0xFF1E293B);
+  static const Color auraAccent = Color(0xFFF472B6);
 
-  // Glassmorphism Constants - Refined for "Aura"
+  // Spotify Theme Colors
+  static const Color spotifyPrimary = Color(0xFF1DB954);
+  static const Color spotifyBackground = Color(0xFF121212);
+  static const Color spotifySurface = Color(0xFF181818);
+  static const Color spotifyAccent = Color(0xFF1ED760);
+
+  // Theme-aware values
+  static Color getPrimary(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraPrimary : spotifyPrimary;
+  static Color getBackground(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraBackground : spotifyBackground;
+  static Color getSurface(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraSurface : spotifySurface;
+
+  // Glassmorphism Constants
   static const double glassBorderRadius = 24.0;
   static const double glassBlur = 20.0;
   static const Color glassBorderColor = Colors.white12;
-  static const Color glassBackgroundColor = Color(0x1AFFFFFF); // 10% white
+  static const Color glassBackgroundColor = Color(0x1AFFFFFF);
 
-  static ThemeData get darkTheme {
+  static ThemeData getTheme(AuraThemeMode mode) {
+    final isAura = mode == AuraThemeMode.aura;
+    final primary = getPrimary(mode);
+    final background = getBackground(mode);
+    final surface = getSurface(mode);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: backgroundColorDark,
-      primaryColor: primaryColor,
-      colorScheme: const ColorScheme.dark(
-        primary: primaryColor,
-        secondary: secondaryColor,
-        surface: surfaceColorDark,
+      scaffoldBackgroundColor: background,
+      primaryColor: primary,
+      colorScheme: ColorScheme.dark(
+        primary: primary,
+        secondary: isAura ? auraAccent : spotifyAccent,
+        surface: surface,
         onSurface: Colors.white,
-        background: backgroundColorDark,
+        background: background,
         onBackground: Colors.white,
       ),
       textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
@@ -39,7 +54,7 @@ class AppTheme {
       ),
       /*
       cardTheme: CardTheme(
-        color: surfaceColorDark,
+        color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(glassBorderRadius),
@@ -55,14 +70,6 @@ class AppTheme {
       ),
     );
   }
-
-  static ThemeData get lightTheme {
-    // Placeholder for light theme if needed, but focusing on Dark Mode for "Aura"
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
-      textTheme: GoogleFonts.outfitTextTheme(),
-    );
-  }
 }
+
+enum AuraThemeMode { aura, spotify }

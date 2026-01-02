@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:window_manager/window_manager.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/theme_provider.dart';
 
-class CustomTitleBar extends StatelessWidget {
+class CustomTitleBar extends ConsumerWidget {
   final List<Widget>? actions;
   final bool showBackButton;
 
@@ -14,7 +12,10 @@ class CustomTitleBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isAura = themeMode == AuraThemeMode.aura;
+
     return Container(
       height: 50,
       decoration: BoxDecoration(
@@ -46,7 +47,11 @@ class CustomTitleBar extends StatelessWidget {
               if (showBackButton) const SizedBox(width: 12),
               
               // Branding
-              const Icon(Icons.auto_awesome_rounded, size: 20, color: AppTheme.primaryColor),
+              Icon(
+                isAura ? Icons.auto_awesome_rounded : Icons.music_note_rounded,
+                size: 20, 
+                color: AppTheme.getPrimary(themeMode),
+              ),
               const SizedBox(width: 10),
               Text(
                 "AuraBeats",
@@ -60,6 +65,12 @@ class CustomTitleBar extends StatelessWidget {
               
               const Spacer(),
               
+              // Theme Toggle
+              _TitleBarButton(
+                icon: isAura ? Icons.palette_outlined : Icons.palette_rounded,
+                onPressed: () => ref.read(themeProvider.notifier).toggleTheme(),
+              ),
+
               if (actions != null) ...actions!,
               
               const SizedBox(width: 8),
