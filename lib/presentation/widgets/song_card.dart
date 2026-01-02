@@ -8,6 +8,8 @@ import '../providers/favorites_provider.dart';
 import '../providers/audio_player_provider.dart';
 import 'glass_container.dart';
 
+import '../providers/theme_provider.dart';
+
 class SongCard extends ConsumerWidget {
   final SongSuggestion song;
 
@@ -18,9 +20,11 @@ class SongCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLiked = ref.watch(favoritesProvider.notifier).isFavorite(song);
     final audioState = ref.watch(audioPlaybackProvider);
+    final isLiked = ref.watch(favoritesProvider).any((s) => s.title == song.title);
     final isThisPlaying = audioState.playingUrl == song.previewUrl && audioState.isPlaying;
+    final themeMode = ref.watch(themeProvider);
+    final primaryColor = AppTheme.getPrimary(themeMode);
 
     return Container(
       width: 200,
@@ -78,10 +82,10 @@ class SongCard extends ConsumerWidget {
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppTheme.primaryColor.withOpacity(0.9),
+                              color: primaryColor.withOpacity(0.9),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primaryColor.withOpacity(0.4),
+                                  color: primaryColor.withOpacity(0.4),
                                   blurRadius: 10,
                                   spreadRadius: 2,
                                 ),

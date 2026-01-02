@@ -36,30 +36,15 @@ class MoodBackground extends ConsumerWidget {
 class _BaseBackground extends StatelessWidget {
   final MoodType mood;
   final bool isPlaying;
+  final AuraThemeMode themeMode;
 
-  const _BaseBackground({required this.mood, required this.isPlaying});
-
-  Color _getMoodColor() {
-    switch (mood) {
-      case MoodType.love:
-        return const Color(0xFF4A148C); // Deep Purple/Wine
-      case MoodType.sad:
-        return const Color(0xFF102027); // Dark Blue Grey
-      case MoodType.happy:
-        return const Color(0xFFE65100); // Deep Orange
-      case MoodType.chill:
-        return const Color(0xFF004D40); // Deep Teal
-      case MoodType.energetic:
-        return const Color(0xFFBF360C); // Deep Red Orange
-      case MoodType.none:
-      default:
-        return const Color(0xFF0F0C29); // Default Space Blue
-    }
-  }
+  const _BaseBackground({required this.mood, required this.isPlaying, required this.themeMode});
 
   @override
   Widget build(BuildContext context) {
-    final moodColor = _getMoodColor();
+    final colors = _getMoodColors(mood, isPlaying);
+    final isSpotify = themeMode == AuraThemeMode.spotify;
+
     return AnimatedContainer(
       duration: 2.seconds,
       decoration: BoxDecoration(

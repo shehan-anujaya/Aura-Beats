@@ -5,35 +5,41 @@ import '../../domain/entities/chat_message.dart';
 import 'glass_container.dart';
 import 'song_card.dart';
 
-class ChatBubble extends StatelessWidget {
+import '../providers/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class ChatBubble extends ConsumerWidget {
   final ChatMessage message;
 
   const ChatBubble({super.key, required this.message});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isUser = message.isUser;
+    final themeMode = ref.watch(themeProvider);
     
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         child: isUser
-            ? _buildUserBubble(context)
-            : _buildAIBubble(context),
+            ? _buildUserBubble(context, themeMode)
+            : _buildAIBubble(context, themeMode),
       ),
     ).animate().fade().scale();
   }
 
-  Widget _buildUserBubble(BuildContext context) {
+  Widget _buildUserBubble(BuildContext context, AuraThemeMode themeMode) {
+    final primary = AppTheme.getPrimary(themeMode);
+    
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppTheme.primaryColor,
-            AppTheme.primaryDark,
+            primary,
+            themeMode == AuraThemeMode.aura ? AppTheme.auraPrimaryDark : primary.withOpacity(0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -46,7 +52,7 @@ class ChatBubble extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.25),
+            color: primary.withOpacity(0.25),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -64,20 +70,23 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildAIBubble(BuildContext context) {
+  Widget _buildAIBubble(BuildContext context, AuraThemeMode themeMode) {
+    final isSpotify = themeMode == AuraThemeMode.spotify;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GlassContainer(
           margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          color: isSpotify ? Colors.white.withOpacity(0.05) : null,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
             bottomLeft: Radius.circular(4),
             bottomRight: Radius.circular(24),
           ),
-          blur: 25,
+          blur: isSpotify ? 10 : 25,
           child: Text(
             message.content,
             style: TextStyle(
