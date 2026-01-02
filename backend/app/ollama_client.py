@@ -26,9 +26,10 @@ class OllamaClient:
         CRITICAL RULES:
         1. Respond ONLY with a valid JSON array of objects.
         2. Each object must have: "title", "artist", "genre", "mood", "reason".
-        3. The "reason" should explain why this specific song matches the user's vibe (max 15 words).
-        4. Do NOT include any markdown formatting, preamble, or postamble. Just the raw JSON array.
-        5. If the user's input is unclear, suggest general "vibe-check" songs.
+        3. The "mood" MUST be one of: "Love", "Sad", "Happy", "Chill", "Energetic".
+        4. The "reason" should explain why this specific song matches the user's vibe (max 15 words).
+        5. Do NOT include any markdown formatting, preamble, or postamble. Just the raw JSON array.
+        6. If the user's input is unclear, suggest general "vibe-check" songs.
         """
         
         messages = [{"role": "system", "content": system_prompt}]
