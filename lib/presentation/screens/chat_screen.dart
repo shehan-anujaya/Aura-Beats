@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../controllers/chat_controller.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/audio_player_provider.dart';
+import '../widgets/mood_background.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/song_card.dart';
@@ -41,14 +42,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  Color _getMoodColor(String? mood) {
-    if (mood == null) return const Color(0xFF0F0C29);
+  MoodType _getMoodType(String? mood) {
+    if (mood == null) return MoodType.none;
     final m = mood.toLowerCase();
-    if (m.contains('calm') || m.contains('peaceful')) return const Color(0xFF1A237E);
-    if (m.contains('energ') || m.contains('happ') || m.contains('upbeat')) return const Color(0xFF880E4F);
-    if (m.contains('sad') || m.contains('melancholy') || m.contains('lonely')) return const Color(0xFF263238);
-    if (m.contains('relax') || m.contains('chill')) return const Color(0xFF004D40);
-    return const Color(0xFF0F0C29);
+    if (m.contains('love')) return MoodType.love;
+    if (m.contains('sad') || m.contains('melancholy')) return MoodType.sad;
+    if (m.contains('happ') || m.contains('upbeat') || m.contains('joy')) return MoodType.happy;
+    if (m.contains('chill') || m.contains('relax') || m.contains('calm')) return MoodType.chill;
+    if (m.contains('energ') || m.contains('pump') || m.contains('power')) return MoodType.energetic;
+    return MoodType.none;
   }
 
   @override
@@ -63,114 +65,85 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
     });
 
-    final moodColor = _getMoodColor(audioState.currentMood);
+    final currentMood = _getMoodType(audioState.currentMood);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Dynamic Gradient Background with Mood Pulse
-          AnimatedContainer(
-            duration: const Duration(seconds: 2),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  moodColor,
-                  audioState.isPlaying ? moodColor.withOpacity(0.8) : const Color(0xFF302B63),
-                  const Color(0xFF24243E),
-                ],
-              ),
-            ),
-            child: audioState.isPlaying 
-              ? Center(
-                  child: Container(
-                    width: 400,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: moodColor.withOpacity(0.1),
-                    ),
-                  ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                   .scale(begin: const Offset(1, 1), end: const Offset(1.5, 1.5), duration: 3.seconds, curve: Curves.easeInOut)
-                   .blur(begin: const Offset(50, 50), end: const Offset(100, 100))
-                )
-              : null,
-          ),
-          
-          Column(
-            children: [
-              CustomTitleBar(
-                actions: [
-                  // Connectivity Indicator
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final isConnected = ref.watch(backendConnectivityProvider);
-                      return Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isConnected ? Colors.greenAccent : Colors.redAccent,
-                              boxShadow: [
-                                if (isConnected)
-                                  BoxShadow(
-                                    color: Colors.greenAccent.withOpacity(0.5),
-                                    blurRadius: 4,
-                                    spreadRadius: 1,
-                                  ),
-                              ],
-                            ),
+      body: MoodBackground(
+        mood: currentMood,
+        isPlaying: audioState.isPlaying,
+        child: Column(
+          children: [
+            CustomTitleBar(
+              actions: [
+                // Connectivity Indicator
+                Consumer(
+                  builder: (context, ref, child) {
+                    final isConnected = ref.watch(backendConnectivityProvider);
+                    return Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isConnected ? Colors.greenAccent : Colors.redAccent,
+                            boxShadow: [
+                              if (isConnected)
+                                BoxShadow(
+                                  color: Colors.greenAccent.withOpacity(0.5),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            isConnected ? "Aura Online" : "Aura Offline",
-                            style: TextStyle(
-                              color: isConnected ? Colors.greenAccent.withOpacity(0.7) : Colors.redAccent.withOpacity(0.7),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isConnected ? "Aura Online" : "Aura Offline",
+                          style: TextStyle(
+                            color: isConnected ? Colors.greenAccent.withOpacity(0.7) : Colors.redAccent.withOpacity(0.7),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(Icons.favorite, size: 20, color: Colors.white70),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const FavoritesScreen()),
-                      );
-                    },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton(
-                    icon: const Icon(Icons.refresh, size: 20, color: Colors.white70),
-                    onPressed: () => ref.read(chatProvider.notifier).reset(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(16, 120, 16, 16),
-                  itemCount: chatState.messages.length,
-                  itemBuilder: (context, index) {
-                    final msg = chatState.messages[index];
-                    return ChatBubble(message: msg)
-                        .animate()
-                        .fade(duration: 400.ms)
-                        .slideY(begin: 0.2, end: 0);
+                        ),
+                      ],
+                    );
                   },
                 ),
+                const SizedBox(width: 16),
+                IconButton(
+                  icon: const Icon(Icons.favorite, size: 20, color: Colors.white70),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+                    );
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 12),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 20, color: Colors.white70),
+                  onPressed: () => ref.read(chatProvider.notifier).reset(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(16, 120, 16, 16),
+                itemCount: chatState.messages.length,
+                itemBuilder: (context, index) {
+                  final msg = chatState.messages[index];
+                  return ChatBubble(message: msg)
+                      .animate()
+                      .fade(duration: 400.ms)
+                      .slideY(begin: 0.2, end: 0);
+                },
               ),
+            ),
               
               // Mood Check-in Overlay
               if (audioState.hasJustFinished)
@@ -277,7 +250,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ],
           ),
-        ],
       ),
     );
   }
