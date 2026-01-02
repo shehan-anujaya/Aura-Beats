@@ -20,8 +20,8 @@ class MoodBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _BaseBackground(mood: mood, isPlaying: isPlaying),
-        if (isPlaying) _MoodOverlay(mood: mood),
+        Positioned.fill(child: _BaseBackground(mood: mood, isPlaying: isPlaying)),
+        if (isPlaying) Positioned.fill(child: _MoodOverlay(mood: mood)),
         child,
       ],
     );
@@ -105,21 +105,21 @@ class ParticleEffect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: List.generate(15, (index) {
+      children: List.generate(20, (index) {
         final random = math.Random();
         final startX = random.nextDouble() * MediaQuery.of(context).size.width;
-        final delay = random.nextInt(5000).ms;
-        final duration = (3000 + random.nextInt(4000)).ms;
+        final delay = random.nextInt(3000).ms;
+        final duration = (4000 + random.nextInt(4000)).ms;
 
         return Positioned(
           left: startX,
-          bottom: -50,
-          child: Icon(icon, color: color.withOpacity(0.3), size: 10 + random.nextDouble() * 30)
+          bottom: -100,
+          child: Icon(icon, color: color.withOpacity(0.5), size: 20 + random.nextDouble() * 40)
               .animate(onPlay: (controller) => controller.repeat())
-              .moveY(begin: 0, end: -MediaQuery.of(context).size.height - 100, duration: duration, delay: delay, curve: Curves.easeInOut)
-              .fade(begin: 0, end: 0.6, duration: 1.seconds)
+              .moveY(begin: 0, end: -MediaQuery.of(context).size.height - 200, duration: duration, delay: delay, curve: Curves.easeInOut)
+              .fade(begin: 0, end: 1.0, duration: 1.seconds)
               .then()
-              .fade(begin: 0.6, end: 0, duration: 1.seconds),
+              .fade(begin: 1.0, end: 0, duration: 1.seconds),
         );
       }),
     );
@@ -132,28 +132,28 @@ class RainEffect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: List.generate(40, (index) {
+      children: List.generate(60, (index) {
         final random = math.Random();
         final startX = random.nextDouble() * MediaQuery.of(context).size.width;
-        final delay = random.nextInt(2000).ms;
-        final duration = (1000 + random.nextInt(1000)).ms;
+        final delay = random.nextInt(1000).ms;
+        final duration = (800 + random.nextInt(600)).ms;
 
         return Positioned(
           left: startX,
           top: -100,
           child: Container(
-            width: 1,
-            height: 20 + random.nextDouble() * 40,
+            width: 2,
+            height: 30 + random.nextDouble() * 50,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.blueAccent.withOpacity(0), Colors.blueAccent.withOpacity(0.4)],
+                colors: [Colors.blueAccent.withOpacity(0), Colors.blueAccent.withOpacity(0.6)],
               ),
             ),
           )
               .animate(onPlay: (controller) => controller.repeat())
-              .moveY(begin: 0, end: MediaQuery.of(context).size.height + 200, duration: duration, delay: delay, curve: Curves.linear),
+              .moveY(begin: 0, end: MediaQuery.of(context).size.height + 250, duration: duration, delay: delay, curve: Curves.linear),
         );
       }),
     );
@@ -204,16 +204,21 @@ class PulseEffect extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: 400,
-        height: 400,
+        width: 500,
+        height: 500,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.orangeAccent.withOpacity(0.1),
+          gradient: RadialGradient(
+            colors: [
+              Colors.orangeAccent.withOpacity(0.3),
+              Colors.redAccent.withOpacity(0.0),
+            ],
+          ),
         ),
       ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-       .scale(begin: const Offset(1, 1), end: const Offset(1.8, 1.8), duration: 1.seconds, curve: Curves.easeInOut)
-       .blur(begin: const Offset(50, 50), end: const Offset(120, 120))
-       .fade(begin: 0.1, end: 0.3),
+       .scale(begin: const Offset(0.8, 0.8), end: const Offset(2.5, 2.5), duration: 1.2.seconds, curve: Curves.easeInOut)
+       .blur(begin: const Offset(40, 40), end: const Offset(150, 150))
+       .fade(begin: 0.1, end: 0.5),
     );
   }
 }

@@ -68,6 +68,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final currentMood = _getMoodType(audioState.currentMood);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: MoodBackground(
         mood: currentMood,
         isPlaying: audioState.isPlaying,
