@@ -62,4 +62,13 @@ class LocalStorageService {
   Future<void> clearHistory() async {
     await _box.delete(keyChatHistory);
   }
+
+  // Theme
+  Future<void> saveTheme(String theme) async {
+    await _box.put('preferred_theme', theme);
+  }
+
+  String? getTheme() {
+    return _box.get('preferred_theme');
+  }
 }

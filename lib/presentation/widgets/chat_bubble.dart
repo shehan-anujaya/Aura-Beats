@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/chat_message.dart';
+import '../providers/theme_provider.dart';
 import 'glass_container.dart';
 import 'song_card.dart';
-
-import '../providers/theme_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatBubble extends ConsumerWidget {
   final ChatMessage message;

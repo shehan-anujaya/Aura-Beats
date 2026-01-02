@@ -51,14 +51,32 @@ class _BaseBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            moodColor,
-            isPlaying ? moodColor.withOpacity(0.8) : const Color(0xFF302B63),
-            const Color(0xFF24243E),
-          ],
+          colors: isSpotify 
+              ? [const Color(0xFF121212), const Color(0xFF181818)]
+              : colors,
         ),
       ),
     );
+  }
+
+  List<Color> _getMoodColors(MoodType mood, bool isPlaying) {
+    if (!isPlaying) return [AppTheme.auraBackground, const Color(0xFF1E293B)];
+
+    switch (mood) {
+      case MoodType.love:
+        return [const Color(0xFF4A148C), const Color(0xFF880E4F)];
+      case MoodType.sad:
+        return [const Color(0xFF0D47A1), const Color(0xFF001F3F)];
+      case MoodType.happy:
+        return [const Color(0xFFFF8F00), const Color(0xFFE65100)];
+      case MoodType.chill:
+        return [const Color(0xFF263238), const Color(0xFF455A64)];
+      case MoodType.energetic:
+        return [const Color(0xFFBF360C), const Color(0xFFD84315)];
+      case MoodType.none:
+      default:
+        return [AppTheme.auraBackground, const Color(0xFF1E293B)];
+    }
   }
 }
 

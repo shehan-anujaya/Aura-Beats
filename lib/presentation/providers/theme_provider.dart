@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/local_storage_service.dart';
 import '../../core/di/injection_container.dart';
-
-enum AuraThemeMode { aura, spotify }
+import '../../core/theme/app_theme.dart';
 
 final themeProvider = StateNotifierProvider<ThemeNotifier, AuraThemeMode>((ref) {
   return ThemeNotifier(sl<LocalStorageService>());
@@ -10,14 +9,13 @@ final themeProvider = StateNotifierProvider<ThemeNotifier, AuraThemeMode>((ref) 
 
 class ThemeNotifier extends StateNotifier<AuraThemeMode> {
   final LocalStorageService _storage;
-  static const String _themeKey = 'preferred_theme';
 
   ThemeNotifier(this._storage) : super(AuraThemeMode.aura) {
     _loadTheme();
   }
 
   void _loadTheme() {
-    final savedTheme = _storage.get(_themeKey);
+    final savedTheme = _storage.getTheme();
     if (savedTheme != null) {
       state = savedTheme == 'spotify' ? AuraThemeMode.spotify : AuraThemeMode.aura;
     }
@@ -25,6 +23,6 @@ class ThemeNotifier extends StateNotifier<AuraThemeMode> {
 
   void toggleTheme() {
     state = state == AuraThemeMode.aura ? AuraThemeMode.spotify : AuraThemeMode.aura;
-    _storage.save(_themeKey, state == AuraThemeMode.spotify ? 'spotify' : 'aura');
+    _storage.saveTheme(state == AuraThemeMode.spotify ? 'spotify' : 'aura');
   }
 }

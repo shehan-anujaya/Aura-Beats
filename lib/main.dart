@@ -5,6 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'presentation/screens/chat_screen.dart';
 import 'data/datasources/local_storage_service.dart';
 import 'core/di/injection_container.dart' as di;
+import 'presentation/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +30,6 @@ void main() async {
     await windowManager.focus();
   });
 
-import 'presentation/providers/theme_provider.dart';
-
-void main() async {
-  // ... existing init ...
   runApp(const ProviderScope(child: MyApp()));
 }
 
