@@ -20,25 +20,25 @@ class SongCard extends ConsumerWidget {
     final isThisPlaying = audioState.playingUrl == song.previewUrl && audioState.isPlaying;
 
     return Container(
-      width: 220,
-      margin: const EdgeInsets.only(right: 16, bottom: 8, top: 8),
+      width: 200,
+      margin: const EdgeInsets.only(right: 12, bottom: 8, top: 8),
       child: GlassContainer(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white.withAlpha(15),
+        borderRadius: BorderRadius.circular(28),
         padding: const EdgeInsets.all(0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Album Art / Media Section
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
+                        topLeft: Radius.circular(28),
+                        topRight: Radius.circular(28),
                       ),
                       child: song.imageUrl != null
                           ? Image.network(
@@ -49,7 +49,7 @@ class SongCard extends ConsumerWidget {
                           : _buildPlaceholder(),
                     ),
                   ),
-                  // Dark overlay for controls
+                  // Premium Gradient Overlay
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
@@ -57,47 +57,56 @@ class SongCard extends ConsumerWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.black.withOpacity(0.2),
-                            Colors.black.withOpacity(0.5),
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.7),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  // Play/Pause Button
+                  // Play/Pause Button - Pulsing
                   if (song.previewUrl != null)
                     Center(
-                      child: GestureDetector(
-                        onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!, song.mood),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.2),
-                          ),
-                          child: Icon(
-                            isThisPlaying ? Icons.pause : Icons.play_arrow,
-                            size: 32,
-                            color: Colors.white,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!, song.mood),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.primaryColor.withOpacity(0.9),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.primaryColor.withOpacity(0.4),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isThisPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                              size: 32,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  // Like Button
+                  // Like Button - Top Right
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    top: 10,
+                    right: 10,
                     child: GestureDetector(
                       onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(song),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black.withOpacity(0.3),
-                        ),
+                      child: GlassContainer(
+                        padding: const EdgeInsets.all(6),
+                        borderRadius: BorderRadius.circular(12),
+                        blur: 5,
+                        color: Colors.black26,
                         child: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          size: 18,
+                          isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          size: 16,
                           color: isLiked ? Colors.redAccent : Colors.white70,
                         ),
                       ),
@@ -106,61 +115,53 @@ class SongCard extends ConsumerWidget {
                 ],
               ),
             ),
-            // Details
+            // Details - Refined
             Expanded(
               flex: 4,
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          song.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          song.artist,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.white10,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                song.genre,
-                                style: const TextStyle(color: Colors.white38, fontSize: 9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
                     Text(
-                      song.reason,
-                      style: const TextStyle(color: Colors.white54, fontSize: 10, fontStyle: FontStyle.italic),
-                      maxLines: 2,
+                      song.title,
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.5,
+                      ),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      song.artist,
+                      style: GoogleFonts.outfit(
+                        color: Colors.white60,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        song.reason,
+                        style: GoogleFonts.outfit(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          height: 1.3,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -169,7 +170,7 @@ class SongCard extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ).animate().scale(begin: const Offset(1, 1), end: const Offset(1, 1)).shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.03));
   }
 
   Widget _buildPlaceholder() {

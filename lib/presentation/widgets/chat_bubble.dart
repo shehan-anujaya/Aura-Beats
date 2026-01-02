@@ -27,34 +27,39 @@ class ChatBubble extends StatelessWidget {
 
   Widget _buildUserBubble(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             AppTheme.primaryColor,
-            AppTheme.primaryColor.withBlue(255),
+            AppTheme.primaryDark,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+          bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(4),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: AppTheme.primaryColor.withOpacity(0.25),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Text(
         message.content,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+          fontSize: 14.5,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
@@ -64,24 +69,29 @@ class ChatBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GlassContainer(
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
             bottomLeft: Radius.circular(4),
-            bottomRight: Radius.circular(20),
+            bottomRight: Radius.circular(24),
           ),
-          blur: 15,
+          blur: 25,
           child: Text(
             message.content,
-            style: const TextStyle(color: Colors.white, height: 1.4),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.95),
+              height: 1.5,
+              fontSize: 14.5,
+              letterSpacing: 0.1,
+            ),
           ),
         ),
         if (message.suggestions != null && message.suggestions!.isNotEmpty)
           Container(
-            height: 260,
-            margin: const EdgeInsets.only(bottom: 16, top: 4),
+            height: 280,
+            margin: const EdgeInsets.only(bottom: 12, top: 4),
             child: ListView.builder(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -90,11 +100,12 @@ class ChatBubble extends StatelessWidget {
               itemBuilder: (context, index) {
                 final song = message.suggestions![index];
                 return SizedBox(
-                  width: 180,
+                  width: 200,
                   child: SongCard(song: song)
-                      .animate(delay: Duration(milliseconds: index * 100))
-                      .fade(duration: 500.ms)
-                      .slideX(begin: 0.2, end: 0),
+                      .animate(delay: (200 * index).ms)
+                      .shimmer(duration: 1.5.seconds, color: Colors.white.withOpacity(0.05))
+                      .fade(duration: 600.ms)
+                      .slideX(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
                 );
               },
             ),

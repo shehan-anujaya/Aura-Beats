@@ -15,8 +15,16 @@ class CustomTitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
-      color: Colors.transparent,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withOpacity(0.05),
+            width: 1,
+          ),
+        ),
+      ),
       child: Stack(
         children: [
           // Draggable Area
@@ -26,26 +34,26 @@ class CustomTitleBar extends StatelessWidget {
           
           Row(
             children: [
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               if (showBackButton)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, size: 16, color: Colors.white70),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white70),
                   onPressed: () => Navigator.of(context).pop(),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
-              if (showBackButton) const SizedBox(width: 8),
+              if (showBackButton) const SizedBox(width: 12),
               
               // Branding
-              const Icon(Icons.auto_awesome, size: 18, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              const Icon(Icons.auto_awesome_rounded, size: 20, color: AppTheme.primaryColor),
+              const SizedBox(width: 10),
               Text(
                 "AuraBeats",
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  letterSpacing: 1.1,
+                style: GoogleFonts.outfit(
+                  color: Colors.white.withOpacity(0.95),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  letterSpacing: -0.5,
                 ),
               ),
               

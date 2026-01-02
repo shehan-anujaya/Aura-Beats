@@ -26,22 +26,48 @@ class GlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(AppTheme.glassBorderRadius);
+    
     return Container(
       width: width,
       height: height,
       margin: margin,
       decoration: BoxDecoration(
         color: color ?? AppTheme.glassBackgroundColor,
-        borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.glassBorderRadius),
-        border: Border.all(color: AppTheme.glassBorderColor),
+        borderRadius: effectiveBorderRadius,
+        border: Border.all(color: AppTheme.glassBorderColor.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: ClipRRect(
-        borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.glassBorderRadius),
+        borderRadius: effectiveBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: Padding(
-            padding: padding ?? const EdgeInsets.all(16.0),
-            child: child,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.05),
+                  Colors.white.withOpacity(0.0),
+                ],
+              ),
+              borderRadius: effectiveBorderRadius,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 0.5,
+              ),
+            ),
+            child: Padding(
+              padding: padding ?? const EdgeInsets.all(16.0),
+              child: child,
+            ),
           ),
         ),
       ),

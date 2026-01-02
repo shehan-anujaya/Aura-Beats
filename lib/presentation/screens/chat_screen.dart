@@ -196,23 +196,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ).animate().scale(curve: Curves.elasticOut, duration: 600.ms).fade(),
                 ),
 
-              // Input Area
+              // Input Area - Premium Floating Pill
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
                 child: GlassContainer(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  borderRadius: BorderRadius.circular(32),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                  borderRadius: BorderRadius.circular(40),
+                  blur: 30,
+                  color: Colors.white.withOpacity(0.08),
                   child: Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _textController,
-                          style: const TextStyle(color: Colors.white, fontSize: 15),
-                          decoration: const InputDecoration(
-                            hintText: "How's your heart feeling today?",
-                            hintStyle: TextStyle(color: Colors.white38),
+                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: "Speak your heart to Aura...",
+                            hintStyle: GoogleFonts.outfit(color: Colors.white38, fontSize: 15),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           onSubmitted: (value) {
                             if (value.trim().isNotEmpty) {
@@ -222,28 +224,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       if (chatState.isLoading)
                         const Padding(
                           padding: EdgeInsets.all(12.0),
                           child: SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: 22,
+                            height: 22,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                              strokeWidth: 2.5,
                               valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                             ),
                           ),
                         )
                       else
-                        IconButton(
-                          icon: const Icon(Icons.auto_awesome, color: AppTheme.primaryColor),
-                          onPressed: () {
-                            if (_textController.text.trim().isNotEmpty) {
-                              ref.read(chatProvider.notifier).sendMessage(_textController.text);
-                              _textController.clear();
-                            }
-                          },
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppTheme.primaryColor.withOpacity(0.15),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.auto_awesome_rounded, color: AppTheme.primaryColor, size: 24),
+                            onPressed: () {
+                              if (_textController.text.trim().isNotEmpty) {
+                                ref.read(chatProvider.notifier).sendMessage(_textController.text);
+                                _textController.clear();
+                              }
+                            },
+                          ),
                         ),
                     ],
                   ),
