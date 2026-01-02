@@ -4,6 +4,8 @@ import '../providers/favorites_provider.dart';
 import '../widgets/song_card.dart';
 import '../widgets/custom_title_bar.dart';
 import '../widgets/glass_container.dart';
+import '../providers/theme_provider.dart';
+import '../../core/theme/app_theme.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -11,21 +13,25 @@ class FavoritesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritesProvider);
+    final themeMode = ref.watch(themeProvider);
+    final isSpotify = themeMode == AuraThemeMode.spotify;
 
     return Scaffold(
       body: Stack(
         children: [
           // Background (Matching ChatScreen)
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0F0C29),
-                  Color(0xFF302B63),
-                  Color(0xFF24243E),
-                ],
+                colors: isSpotify 
+                    ? [const Color(0xFF121212), const Color(0xFF181818)]
+                    : [
+                        const Color(0xFF0F0C29),
+                        const Color(0xFF302B63),
+                        const Color(0xFF24243E),
+                      ],
               ),
             ),
           ),

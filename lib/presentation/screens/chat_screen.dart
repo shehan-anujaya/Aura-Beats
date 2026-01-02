@@ -157,7 +157,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   child: GlassContainer(
                     padding: const EdgeInsets.all(16),
                     borderRadius: BorderRadius.circular(24),
-                    color: AppTheme.primaryColor.withOpacity(0.15),
+                    color: primaryColor.withOpacity(0.15),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -248,7 +248,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             color: primaryColor.withOpacity(0.15),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.auto_awesome_rounded, color: primaryColor, size: 24),
+                            icon: Icon(Icons.auto_awesome_rounded, color: primaryColor, size: 24),
                             onPressed: () {
                               if (_textController.text.trim().isNotEmpty) {
                                 ref.read(chatProvider.notifier).sendMessage(_textController.text);
