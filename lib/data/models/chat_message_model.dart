@@ -41,7 +41,7 @@ class ChatMessageModel extends ChatMessage {
       timestamp: DateTime.parse(json['timestamp']),
       suggestions: json['suggestions'] != null
           ? (json['suggestions'] as List)
-              .map((s) => SongSuggestionModel.fromJson(s))
+              .map((s) => SongSuggestionModel.fromJson(Map<String, dynamic>.from(s)))
               .toList()
           : null,
     );
