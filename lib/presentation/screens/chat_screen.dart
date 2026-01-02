@@ -7,6 +7,7 @@ import '../controllers/chat_controller.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/audio_player_provider.dart';
 import '../widgets/mood_background.dart';
+import '../providers/theme_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/song_card.dart';
@@ -58,6 +59,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatProvider);
     final audioState = ref.watch(audioPlaybackProvider);
+    final themeMode = ref.watch(themeProvider);
+    final primaryColor = AppTheme.getPrimary(themeMode);
 
     // Auto-scroll on new message
     ref.listen(chatProvider, (previous, next) {
@@ -227,14 +230,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                       const SizedBox(width: 12),
                       if (chatState.isLoading)
-                        const Padding(
-                          padding: EdgeInsets.all(12.0),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
                           child: SizedBox(
                             width: 22,
                             height: 22,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                             ),
                           ),
                         )
@@ -242,10 +245,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppTheme.primaryColor.withOpacity(0.15),
+                            color: primaryColor.withOpacity(0.15),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.auto_awesome_rounded, color: AppTheme.primaryColor, size: 24),
+                            icon: const Icon(Icons.auto_awesome_rounded, color: primaryColor, size: 24),
                             onPressed: () {
                               if (_textController.text.trim().isNotEmpty) {
                                 ref.read(chatProvider.notifier).sendMessage(_textController.text);
