@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../core/theme/app_theme.dart';
 import '../../domain/entities/song_suggestion.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/audio_player_provider.dart';
