@@ -6,7 +6,7 @@ class OllamaService {
   final Dio _dio;
   // Use http://localhost:11434/api/chat for chat-based (e.g. llama3, qwen) or /api/generate
   // Android emulator needs 10.0.2.2 usually, but for Desktop (Windows) localhost is fine.
-  static const String _baseUrl = 'http://localhost:8000';
+  static const String _baseUrl = 'http://127.0.0.1:8000';
 
   OllamaService(this._dio);
 
