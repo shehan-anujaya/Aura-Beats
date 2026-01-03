@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../data/datasources/local_storage_service.dart';
 import '../../core/di/injection_container.dart';
 import '../../core/theme/app_theme.dart';
