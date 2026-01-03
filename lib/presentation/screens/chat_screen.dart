@@ -142,10 +142,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 itemCount: chatState.messages.length,
                 itemBuilder: (context, index) {
                   final msg = chatState.messages[index];
-                  return ChatBubble(message: msg)
-                      .animate()
-                      .fade(duration: 400.ms)
-                      .slideY(begin: 0.2, end: 0);
+                  return ChatBubble(message: msg);
                 },
               ),
             ),

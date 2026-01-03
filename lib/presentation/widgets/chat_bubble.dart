@@ -25,7 +25,7 @@ class ChatBubble extends ConsumerWidget {
             ? _buildUserBubble(context, themeMode)
             : _buildAIBubble(context, themeMode),
       ),
-    ).animate().fade().scale();
+    );
   }
 
   Widget _buildUserBubble(BuildContext context, AuraThemeMode themeMode) {
