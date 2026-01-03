@@ -15,11 +15,20 @@ void main() async {
   // Init DI
   await di.init();
   
-  // Init Hive via DI
-  await di.sl<LocalStorageService>().init();
-
-  // Init System Tray
-  await SystemTrayService().init();
+  try {
+    // Init Hive via DI
+    await di.sl<LocalStorageService>().init();
+    // Init System Tray
+    await SystemTrayService().init();
+  } catch (e) {
+    debugPrint("Initialization error: $e");
+    if (e.toString().contains('lock failed')) {
+      debugPrint("AuraBeats is already running. Please check your system tray.");
+      // In a real app we might show a native dialog here.
+      // For now, exiting gracefully to avoid crash dumps.
+      return; 
+    }
+  }
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 700),
