@@ -80,38 +80,50 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             CustomTitleBar(
               actions: [
-                // Connectivity Indicator
+                // Connectivity Indicator - Premium Glass Pill
                 Consumer(
                   builder: (context, ref, child) {
                     final isConnected = ref.watch(backendConnectivityProvider);
-                    return Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isConnected ? Colors.greenAccent : Colors.redAccent,
-                            boxShadow: [
-                              if (isConnected)
+                    final color = isConnected ? Colors.greenAccent : Colors.redAccent;
+                    
+                    return GlassContainer(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      borderRadius: BorderRadius.circular(20),
+                      blur: 10,
+                      color: color.withOpacity(0.05),
+                      border: Border.all(color: color.withOpacity(0.2), width: 1),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color,
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Colors.greenAccent.withOpacity(0.5),
+                                  color: color.withOpacity(0.5),
                                   blurRadius: 4,
                                   spreadRadius: 1,
                                 ),
-                            ],
+                              ],
+                            ),
+                          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                           .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 1.seconds)
+                           .tint(color: color.withOpacity(0.8)),
+                          const SizedBox(width: 8),
+                          Text(
+                            isConnected ? "AURA ONLINE" : "AURA OFFLINE",
+                            style: GoogleFonts.outfit(
+                              color: color.withOpacity(0.8),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isConnected ? "Aura Online" : "Aura Offline",
-                          style: TextStyle(
-                            color: isConnected ? Colors.greenAccent.withOpacity(0.7) : Colors.redAccent.withOpacity(0.7),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),
