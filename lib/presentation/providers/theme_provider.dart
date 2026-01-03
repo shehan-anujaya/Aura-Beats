@@ -22,8 +22,12 @@ class ThemeNotifier extends StateNotifier<AuraThemeMode> {
     }
   }
 
+  void setTheme(AuraThemeMode mode) {
+    state = mode;
+    _storage.saveTheme(mode == AuraThemeMode.spotify ? 'spotify' : 'aura');
+  }
+
   void toggleTheme() {
-    state = state == AuraThemeMode.aura ? AuraThemeMode.spotify : AuraThemeMode.aura;
-    _storage.saveTheme(state == AuraThemeMode.spotify ? 'spotify' : 'aura');
+    setTheme(state == AuraThemeMode.aura ? AuraThemeMode.spotify : AuraThemeMode.aura);
   }
 }

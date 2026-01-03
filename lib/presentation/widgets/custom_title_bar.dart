@@ -69,10 +69,45 @@ class CustomTitleBar extends ConsumerWidget {
               
               const Spacer(),
               
-              // Theme Toggle
-              _TitleBarButton(
-                icon: isAura ? Icons.palette_outlined : Icons.palette_rounded,
-                onPressed: () => ref.read(themeProvider.notifier).toggleTheme(),
+              // Theme Selection
+              PopupMenuButton<AuraThemeMode>(
+                icon: Icon(
+                  isAura ? Icons.palette_outlined : Icons.palette_rounded,
+                  size: 16,
+                  color: Colors.white70,
+                ),
+                tooltip: 'Select Theme',
+                offset: const Offset(0, 40),
+                color: AppTheme.getSurface(themeMode),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                ),
+                onSelected: (AuraThemeMode mode) {
+                  ref.read(themeProvider.notifier).setTheme(mode);
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: AuraThemeMode.aura,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.auraPrimary),
+                        const SizedBox(width: 12),
+                        Text('Aura Theme', style: GoogleFonts.outfit(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: AuraThemeMode.spotify,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.music_note_rounded, size: 18, color: AppTheme.spotifyPrimary),
+                        const SizedBox(width: 12),
+                        Text('Spotify Theme', style: GoogleFonts.outfit(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
 
               if (actions != null) ...actions!,
