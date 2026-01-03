@@ -152,6 +152,40 @@ class SongCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
+                    if (isThisPlaying) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _formatDuration(audioState.position),
+                            style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10),
+                          ),
+                          Text(
+                            _formatDuration(audioState.duration),
+                            style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 2,
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 4),
+                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+                          activeTrackColor: primaryColor,
+                          inactiveTrackColor: Colors.white10,
+                          thumbColor: primaryColor,
+                        ),
+                        child: Slider(
+                          value: audioState.position.inMilliseconds.toDouble(),
+                          max: audioState.duration.inMilliseconds.toDouble() > 0 
+                              ? audioState.duration.inMilliseconds.toDouble() 
+                              : 1.0,
+                          onChanged: (value) {
+                            ref.read(audioPlaybackProvider.notifier).seek(Duration(milliseconds: value.toInt()));
+                          },
+                        ),
+                      ),
+                    ],
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -178,6 +212,13 @@ class SongCard extends ConsumerWidget {
         ),
       ),
     ).animate().scale(begin: const Offset(1, 1), end: const Offset(1, 1)).shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.03));
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
   Widget _buildPlaceholder() {
