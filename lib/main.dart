@@ -5,7 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'presentation/screens/chat_screen.dart';
 import 'data/datasources/local_storage_service.dart';
 import 'core/di/injection_container.dart' as di;
-import 'presentation/providers/theme_provider.dart';
+import 'presentation/services/system_tray_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +16,9 @@ void main() async {
   
   // Init Hive via DI
   await di.sl<LocalStorageService>().init();
+
+  // Init System Tray
+  await SystemTrayService().init();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 700),
