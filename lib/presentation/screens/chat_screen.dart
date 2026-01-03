@@ -91,7 +91,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       borderRadius: BorderRadius.circular(20),
                       blur: 10,
                       color: color.withOpacity(0.05),
-                      border: Border.all(color: color.withOpacity(0.2), width: 1),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
