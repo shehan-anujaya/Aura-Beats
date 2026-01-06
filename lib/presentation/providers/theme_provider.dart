@@ -18,16 +18,46 @@ class ThemeNotifier extends StateNotifier<AuraThemeMode> {
   void _loadTheme() {
     final savedTheme = _storage.getTheme();
     if (savedTheme != null) {
-      state = savedTheme == 'spotify' ? AuraThemeMode.spotify : AuraThemeMode.aura;
+      if (savedTheme == 'spotify') {
+        state = AuraThemeMode.spotify;
+      } else if (savedTheme == 'sunset') {
+        state = AuraThemeMode.sunset;
+      } else {
+        state = AuraThemeMode.aura;
+      }
     }
   }
 
   void setTheme(AuraThemeMode mode) {
     state = mode;
-    _storage.saveTheme(mode == AuraThemeMode.spotify ? 'spotify' : 'aura');
+    String themeString;
+    switch (mode) {
+      case AuraThemeMode.aura:
+        themeString = 'aura';
+        break;
+      case AuraThemeMode.spotify:
+        themeString = 'spotify';
+        break;
+      case AuraThemeMode.sunset:
+        themeString = 'sunset';
+        break;
+    }
+    _storage.saveTheme(themeString);
+  }
+
   }
 
   void toggleTheme() {
-    setTheme(state == AuraThemeMode.aura ? AuraThemeMode.spotify : AuraThemeMode.aura);
+    switch (state) {
+      case AuraThemeMode.aura:
+        setTheme(AuraThemeMode.spotify);
+        break;
+      case AuraThemeMode.spotify:
+        setTheme(AuraThemeMode.sunset);
+        break;
+      case AuraThemeMode.sunset:
+        setTheme(AuraThemeMode.aura);
+        break;
+    }
   }
 }

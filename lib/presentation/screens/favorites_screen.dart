@@ -25,13 +25,7 @@ class FavoritesScreen extends ConsumerWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isSpotify 
-                    ? [const Color(0xFF121212), const Color(0xFF181818)]
-                    : [
-                        const Color(0xFF0F0C29),
-                        const Color(0xFF302B63),
-                        const Color(0xFF24243E),
-                      ],
+                colors: _getBackgroundColors(themeMode),
               ),
             ),
           ),
@@ -87,5 +81,25 @@ class FavoritesScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  List<Color> _getBackgroundColors(AuraThemeMode mode) {
+    if (mode == AuraThemeMode.spotify) {
+      return [const Color(0xFF121212), const Color(0xFF181818)];
+    } else if (mode == AuraThemeMode.sunset) {
+      // Warm Gradient
+      return [
+        const Color(0xFF2D2424), // Dark Warm
+        const Color(0xFF4E3D3D), // Lighter Warm
+        const Color(0xFF3E2C2C), // Brownish
+      ];
+    } else {
+      // Aura (Default)
+      return [
+        const Color(0xFF0F0C29),
+        const Color(0xFF302B63),
+        const Color(0xFF24243E),
+      ];
+    }
   }
 }

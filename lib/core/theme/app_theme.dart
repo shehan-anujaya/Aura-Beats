@@ -15,10 +15,45 @@ class AppTheme {
   static const Color spotifySurface = Color(0xFF181818);
   static const Color spotifyAccent = Color(0xFF1ED760);
 
+  // Sunset Theme Colors
+  static const Color sunsetPrimary = Color(0xFFFF5722); // Deep Orange
+  static const Color sunsetBackground = Color(0xFF2D2424); // Dark Warm Grey
+  static const Color sunsetSurface = Color(0xFF4E3D3D); // Warm Brownish Grey
+  static const Color sunsetAccent = Color(0xFFFFC107); // Amber
+
   // Theme-aware values
-  static Color getPrimary(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraPrimary : spotifyPrimary;
-  static Color getBackground(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraBackground : spotifyBackground;
-  static Color getSurface(AuraThemeMode mode) => mode == AuraThemeMode.aura ? auraSurface : spotifySurface;
+  static Color getPrimary(AuraThemeMode mode) {
+    switch (mode) {
+      case AuraThemeMode.aura:
+        return auraPrimary;
+      case AuraThemeMode.spotify:
+        return spotifyPrimary;
+      case AuraThemeMode.sunset:
+        return sunsetPrimary;
+    }
+  }
+
+  static Color getBackground(AuraThemeMode mode) {
+    switch (mode) {
+      case AuraThemeMode.aura:
+        return auraBackground;
+      case AuraThemeMode.spotify:
+        return spotifyBackground;
+      case AuraThemeMode.sunset:
+        return sunsetBackground;
+    }
+  }
+
+  static Color getSurface(AuraThemeMode mode) {
+    switch (mode) {
+      case AuraThemeMode.aura:
+        return auraSurface;
+      case AuraThemeMode.spotify:
+        return spotifySurface;
+      case AuraThemeMode.sunset:
+        return sunsetSurface;
+    }
+  }
 
   // Glassmorphism Constants
   static const double glassBorderRadius = 24.0;
@@ -39,7 +74,9 @@ class AppTheme {
       primaryColor: primary,
       colorScheme: ColorScheme.dark(
         primary: primary,
-        secondary: isAura ? auraAccent : spotifyAccent,
+        secondary: mode == AuraThemeMode.aura 
+            ? auraAccent 
+            : (mode == AuraThemeMode.spotify ? spotifyAccent : sunsetAccent),
         surface: surface,
         onSurface: Colors.white,
         background: background,
@@ -72,4 +109,4 @@ class AppTheme {
   }
 }
 
-enum AuraThemeMode { aura, spotify }
+enum AuraThemeMode { aura, spotify, sunset }

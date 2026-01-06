@@ -19,6 +19,7 @@ class CustomTitleBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
     final isAura = themeMode == AuraThemeMode.aura;
+    final isSunset = themeMode == AuraThemeMode.sunset;
 
     return Container(
       height: 50,
@@ -52,7 +53,7 @@ class CustomTitleBar extends ConsumerWidget {
               
               // Branding
               Icon(
-                isAura ? Icons.auto_awesome_rounded : Icons.music_note_rounded,
+                isAura || isSunset ? Icons.auto_awesome_rounded : Icons.music_note_rounded,
                 size: 20, 
                 color: AppTheme.getPrimary(themeMode),
               ),
@@ -104,6 +105,16 @@ class CustomTitleBar extends ConsumerWidget {
                         const Icon(Icons.music_note_rounded, size: 18, color: AppTheme.spotifyPrimary),
                         const SizedBox(width: 12),
                         Text('Spotify Theme', style: GoogleFonts.outfit(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: AuraThemeMode.sunset,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.wb_sunny_rounded, size: 18, color: AppTheme.sunsetPrimary),
+                        const SizedBox(width: 12),
+                        Text('Sunset Theme', style: GoogleFonts.outfit(fontSize: 14)),
                       ],
                     ),
                   ),

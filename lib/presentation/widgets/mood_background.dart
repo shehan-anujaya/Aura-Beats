@@ -43,7 +43,7 @@ class _BaseBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = _getMoodColors(mood, isPlaying);
+    final colors = _getMoodColors(mood, isPlaying, themeMode);
     final isSpotify = themeMode == AuraThemeMode.spotify;
 
     return AnimatedContainer(
@@ -60,8 +60,12 @@ class _BaseBackground extends StatelessWidget {
     );
   }
 
-  List<Color> _getMoodColors(MoodType mood, bool isPlaying) {
-    if (!isPlaying) return [AppTheme.auraBackground, const Color(0xFF1E293B)];
+  List<Color> _getMoodColors(MoodType mood, bool isPlaying, AuraThemeMode themeMode) {
+    if (!isPlaying) {
+      final bg = AppTheme.getBackground(themeMode);
+      final surface = AppTheme.getSurface(themeMode);
+      return [bg, surface];
+    }
 
     switch (mood) {
       case MoodType.love:
@@ -76,7 +80,9 @@ class _BaseBackground extends StatelessWidget {
         return [const Color(0xFFBF360C), const Color(0xFFD84315)];
       case MoodType.none:
       default:
-        return [AppTheme.auraBackground, const Color(0xFF1E293B)];
+        final bg = AppTheme.getBackground(themeMode);
+        final surface = AppTheme.getSurface(themeMode);
+        return [bg, surface];
     }
   }
 }
