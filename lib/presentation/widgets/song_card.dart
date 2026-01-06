@@ -10,7 +10,7 @@ import 'glass_container.dart';
 
 import '../providers/theme_provider.dart';
 
-class SongCard extends ConsumerWidget {
+class SongCard extends ConsumerStatefulWidget {
   final SongSuggestion song;
 
   const SongCard({
@@ -19,10 +19,18 @@ class SongCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SongCard> createState() => _SongCardState();
+}
+
+class _SongCardState extends ConsumerState<SongCard> {
+  bool _isDragging = false;
+  double _dragValue = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
     final audioState = ref.watch(audioPlaybackProvider);
-    final isLiked = ref.watch(favoritesProvider).any((s) => s.title == song.title);
-    final isThisPlaying = audioState.playingUrl == song.previewUrl && audioState.isPlaying;
+    final isLiked = ref.watch(favoritesProvider).any((s) => s.title == widget.song.title);
+    final isThisPlaying = audioState.playingUrl == widget.song.previewUrl && audioState.isPlaying;
     final themeMode = ref.watch(themeProvider);
     final primaryColor = AppTheme.getPrimary(themeMode);
 
@@ -47,9 +55,9 @@ class SongCard extends ConsumerWidget {
                         topLeft: Radius.circular(28),
                         topRight: Radius.circular(28),
                       ),
-                      child: song.imageUrl != null
+                      child: widget.song.imageUrl != null
                           ? Image.network(
-                              song.imageUrl!,
+                              widget.song.imageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => _buildPlaceholder(),
                             )
@@ -72,12 +80,12 @@ class SongCard extends ConsumerWidget {
                     ),
                   ),
                   // Play/Pause Button - Pulsing
-                  if (song.previewUrl != null)
+                  if (widget.song.previewUrl != null)
                     Center(
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
-                          onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(song.previewUrl!, song.mood),
+                          onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(widget.song.previewUrl!, widget.song.mood),
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -105,7 +113,7 @@ class SongCard extends ConsumerWidget {
                     top: 10,
                     right: 10,
                     child: GestureDetector(
-                      onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(song),
+                      onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(widget.song),
                       child: GlassContainer(
                         padding: const EdgeInsets.all(6),
                         borderRadius: BorderRadius.circular(12),
@@ -131,7 +139,7 @@ class SongCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      song.title,
+                      widget.song.title,
                       style: GoogleFonts.outfit(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -142,7 +150,7 @@ class SongCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      song.artist,
+                      widget.song.artist,
                       style: GoogleFonts.outfit(
                         color: Colors.white60,
                         fontSize: 12.5,
@@ -157,7 +165,9 @@ class SongCard extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            _formatDuration(audioState.position),
+                            _formatDuration(_isDragging 
+                                ? Duration(milliseconds: _dragValue.toInt())
+                                : audioState.position),
                             style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10),
                           ),
                           Text(
@@ -176,12 +186,28 @@ class SongCard extends ConsumerWidget {
                           thumbColor: primaryColor,
                         ),
                         child: Slider(
-                          value: audioState.position.inMilliseconds.toDouble(),
+                          value: _isDragging 
+                              ? _dragValue 
+                              : audioState.position.inMilliseconds.toDouble().clamp(0, audioState.duration.inMilliseconds.toDouble() > 0 ? audioState.duration.inMilliseconds.toDouble() : 1.0),
                           max: audioState.duration.inMilliseconds.toDouble() > 0 
                               ? audioState.duration.inMilliseconds.toDouble() 
                               : 1.0,
+                          onChangeStart: (value) {
+                            setState(() {
+                              _isDragging = true;
+                              _dragValue = value;
+                            });
+                          },
                           onChanged: (value) {
+                            setState(() {
+                              _dragValue = value;
+                            });
+                          },
+                          onChangeEnd: (value) {
                             ref.read(audioPlaybackProvider.notifier).seek(Duration(milliseconds: value.toInt()));
+                            setState(() {
+                              _isDragging = false;
+                            });
                           },
                         ),
                       ),
