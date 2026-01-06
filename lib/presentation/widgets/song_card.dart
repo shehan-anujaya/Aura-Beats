@@ -219,7 +219,7 @@ class _SongCardState extends ConsumerState<SongCard> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
-                        song.reason,
+                        widget.song.reason,
                         style: GoogleFonts.outfit(
                           color: Colors.white70,
                           fontSize: 10,

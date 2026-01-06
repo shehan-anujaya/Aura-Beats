@@ -45,7 +45,7 @@ class ThemeNotifier extends StateNotifier<AuraThemeMode> {
     _storage.saveTheme(themeString);
   }
 
-  }
+
 
   void toggleTheme() {
     switch (state) {
