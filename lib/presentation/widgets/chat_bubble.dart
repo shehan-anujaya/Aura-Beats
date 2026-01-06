@@ -98,7 +98,7 @@ class ChatBubble extends ConsumerWidget {
         ),
         if (message.suggestions != null && message.suggestions!.isNotEmpty)
           Container(
-            height: 280,
+            height: 320,
             margin: const EdgeInsets.only(bottom: 12, top: 4),
             child: ListView.builder(
               shrinkWrap: true,

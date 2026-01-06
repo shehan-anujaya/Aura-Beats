@@ -130,11 +130,10 @@ class _SongCardState extends ConsumerState<SongCard> {
                 ],
               ),
             ),
-            // Details - Refined
             Expanded(
-              flex: 4,
+              flex: 5,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                padding: EdgeInsets.fromLTRB(14, isThisPlaying ? 8 : 12, 14, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -159,8 +158,8 @@ class _SongCardState extends ConsumerState<SongCard> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
                     if (isThisPlaying) ...[
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -211,7 +210,7 @@ class _SongCardState extends ConsumerState<SongCard> {
                           },
                         ),
                       ),
-                    ],
+                    ] else const Spacer(),
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -223,7 +222,7 @@ class _SongCardState extends ConsumerState<SongCard> {
                         style: GoogleFonts.outfit(
                           color: Colors.white70,
                           fontSize: 10,
-                          height: 1.3,
+                          height: 1.2,
                           fontStyle: FontStyle.italic,
                         ),
                         maxLines: 2,
