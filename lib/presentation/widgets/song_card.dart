@@ -35,26 +35,22 @@ class _SongCardState extends ConsumerState<SongCard> {
     final primaryColor = AppTheme.getPrimary(themeMode);
 
     return Container(
-      width: 200,
-      margin: const EdgeInsets.only(right: 12, bottom: 8, top: 8),
+      width: 210, // Slightly wider for better text spacing
+      margin: const EdgeInsets.only(right: 16, bottom: 12, top: 12),
       child: GlassContainer(
-        color: Colors.white.withAlpha(15),
-        borderRadius: BorderRadius.circular(28),
-        padding: const EdgeInsets.all(0),
+        borderRadius: BorderRadius.circular(32),
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Album Art / Media Section
+            // Album Art Section
             Expanded(
-              flex: 5,
+              flex: 6,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(28),
-                        topRight: Radius.circular(28),
-                      ),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                       child: widget.song.imageUrl != null
                           ? Image.network(
                               widget.song.imageUrl!,
@@ -73,35 +69,40 @@ class _SongCardState extends ConsumerState<SongCard> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.7),
+                            Colors.black.withOpacity(0.4),
+                            Colors.black.withOpacity(0.8),
                           ],
+                          stops: const [0.0, 0.6, 1.0],
                         ),
                       ),
                     ),
                   ),
-                  // Play/Pause Button - Pulsing
+                  // Play/Pause Button - Centered and Refined
                   if (widget.song.previewUrl != null)
                     Center(
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () => ref.read(audioPlaybackProvider.notifier).playPreview(widget.song.previewUrl!, widget.song.mood),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: primaryColor.withOpacity(0.9),
+                              color: isThisPlaying ? primaryColor : Colors.white.withOpacity(0.15),
+                              border: Border.all(color: Colors.white24, width: 1.5),
                               boxShadow: [
-                                BoxShadow(
-                                  color: primaryColor.withOpacity(0.4),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
+                                if (isThisPlaying)
+                                  BoxShadow(
+                                    color: primaryColor.withOpacity(0.4),
+                                    blurRadius: 15,
+                                    spreadRadius: 2,
+                                  ),
                               ],
                             ),
                             child: Icon(
                               isThisPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                              size: 32,
+                              size: 28,
                               color: Colors.white,
                             ),
                           ),
@@ -110,15 +111,17 @@ class _SongCardState extends ConsumerState<SongCard> {
                     ),
                   // Like Button - Top Right
                   Positioned(
-                    top: 10,
-                    right: 10,
+                    top: 14,
+                    right: 14,
                     child: GestureDetector(
                       onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(widget.song),
-                      child: GlassContainer(
-                        padding: const EdgeInsets.all(6),
-                        borderRadius: BorderRadius.circular(12),
-                        blur: 5,
-                        color: Colors.black26,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black38,
+                          border: Border.all(color: Colors.white10),
+                        ),
                         child: Icon(
                           isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                           size: 16,
@@ -130,10 +133,11 @@ class _SongCardState extends ConsumerState<SongCard> {
                 ],
               ),
             ),
+            // Info Section
             Expanded(
               flex: 5,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(14, isThisPlaying ? 8 : 12, 14, 8),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -141,48 +145,34 @@ class _SongCardState extends ConsumerState<SongCard> {
                       widget.song.title,
                       style: GoogleFonts.outfit(
                         color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        letterSpacing: -0.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       widget.song.artist,
                       style: GoogleFonts.outfit(
-                        color: Colors.white60,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const Spacer(),
                     if (isThisPlaying) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _formatDuration(_isDragging 
-                                ? Duration(milliseconds: _dragValue.toInt())
-                                : audioState.position),
-                            style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10),
-                          ),
-                          Text(
-                            _formatDuration(audioState.duration),
-                            style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10),
-                          ),
-                        ],
-                      ),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          trackHeight: 2,
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 4),
+                          trackHeight: 3,
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
                           overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
                           activeTrackColor: primaryColor,
-                          inactiveTrackColor: Colors.white10,
-                          thumbColor: primaryColor,
+                          inactiveTrackColor: Colors.white.withOpacity(0.05),
+                          thumbColor: Colors.white,
                         ),
                         child: Slider(
                           value: _isDragging 
@@ -191,38 +181,29 @@ class _SongCardState extends ConsumerState<SongCard> {
                           max: audioState.duration.inMilliseconds.toDouble() > 0 
                               ? audioState.duration.inMilliseconds.toDouble() 
                               : 1.0,
-                          onChangeStart: (value) {
-                            setState(() {
-                              _isDragging = true;
-                              _dragValue = value;
-                            });
-                          },
-                          onChanged: (value) {
-                            setState(() {
-                              _dragValue = value;
-                            });
-                          },
+                          onChanged: (value) => setState(() => _dragValue = value),
+                          onChangeStart: (_) => setState(() => _isDragging = true),
                           onChangeEnd: (value) {
                             ref.read(audioPlaybackProvider.notifier).seek(Duration(milliseconds: value.toInt()));
-                            setState(() {
-                              _isDragging = false;
-                            });
+                            setState(() => _isDragging = false);
                           },
                         ),
                       ),
-                    ] else const Spacer(),
+                      const SizedBox(height: 4),
+                    ],
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white.withOpacity(0.04),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white.withOpacity(0.05)),
                       ),
                       child: Text(
                         widget.song.reason,
                         style: GoogleFonts.outfit(
-                          color: Colors.white70,
-                          fontSize: 10,
-                          height: 1.2,
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 11,
+                          height: 1.3,
                           fontStyle: FontStyle.italic,
                         ),
                         maxLines: 2,
@@ -236,7 +217,7 @@ class _SongCardState extends ConsumerState<SongCard> {
           ],
         ),
       ),
-    ).animate().scale(begin: const Offset(1, 1), end: const Offset(1, 1)).shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.03));
+    ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.95, 0.95));
   }
 
   String _formatDuration(Duration duration) {

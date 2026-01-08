@@ -161,25 +161,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               // Mood Check-in Overlay
               if (audioState.hasJustFinished)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   child: GlassContainer(
-                    padding: const EdgeInsets.all(16),
-                    borderRadius: BorderRadius.circular(24),
-                    color: primaryColor.withOpacity(0.15),
+                    padding: const EdgeInsets.all(20),
+                    borderRadius: BorderRadius.circular(28),
+                    color: primaryColor.withOpacity(0.12),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           "Aura sensed the vibe. How are you feeling now?",
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          style: GoogleFonts.outfit(
+                            color: Colors.white, 
+                            fontWeight: FontWeight.w600, 
+                            fontSize: 14,
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _MoodButton(
                               label: "Better", 
-                              icon: Icons.wb_sunny_outlined,
+                              icon: Icons.wb_sunny_rounded,
                               onTap: () {
                                 ref.read(chatProvider.notifier).sendMessage("I feel better, thanks!");
                                 ref.read(audioPlaybackProvider.notifier).resetFinished();
@@ -187,7 +191,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             ),
                             _MoodButton(
                               label: "Still Same", 
-                              icon: Icons.filter_drama_outlined,
+                              icon: Icons.filter_drama_rounded,
                               onTap: () {
                                 ref.read(chatProvider.notifier).sendMessage("It's nice, but I'm still feeling a bit the same.");
                                 ref.read(audioPlaybackProvider.notifier).resetFinished();
@@ -195,7 +199,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             ),
                             _MoodButton(
                               label: "Different Vibe", 
-                              icon: Icons.auto_awesome_mosaic_outlined,
+                              icon: Icons.auto_awesome_mosaic_rounded,
                               onTap: () {
                                 ref.read(chatProvider.notifier).sendMessage("Can we try a different vibe?");
                                 ref.read(audioPlaybackProvider.notifier).resetFinished();
@@ -205,67 +209,82 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                       ],
                     ),
-                  ).animate().scale(curve: Curves.elasticOut, duration: 600.ms).fade(),
+                  ).animate().scale(curve: Curves.easeOutBack, duration: 600.ms).fade(),
                 ),
-
-              // Input Area - Premium Floating Pill
+ 
+              // Input Area - Refined Premium Pill
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                child: GlassContainer(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                  borderRadius: BorderRadius.circular(40),
-                  blur: 30,
-                  color: Colors.white.withOpacity(0.08),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _textController,
-                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: "Speak your heart to Aura...",
-                            hintStyle: GoogleFonts.outfit(color: Colors.white38, fontSize: 15),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          onSubmitted: (value) {
-                            if (value.trim().isNotEmpty) {
-                              ref.read(chatProvider.notifier).sendMessage(value);
-                              _textController.clear();
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      if (chatState.isLoading)
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                child: Hero(
+                  tag: 'chat_input',
+                  child: GlassContainer(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    borderRadius: BorderRadius.circular(40),
+                    blur: 40,
+                    color: Colors.white.withOpacity(0.06),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _textController,
+                            style: GoogleFonts.outfit(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                            decoration: InputDecoration(
+                              hintText: "Speak your heart to Aura...",
+                              hintStyle: GoogleFonts.outfit(color: Colors.white24, fontSize: 15),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                          ),
-                        )
-                      else
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: primaryColor.withOpacity(0.15),
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.auto_awesome_rounded, color: primaryColor, size: 24),
-                            onPressed: () {
-                              if (_textController.text.trim().isNotEmpty) {
-                                ref.read(chatProvider.notifier).sendMessage(_textController.text);
+                            onSubmitted: (value) {
+                              if (value.trim().isNotEmpty) {
+                                ref.read(chatProvider.notifier).sendMessage(value);
                                 _textController.clear();
                               }
                             },
                           ),
                         ),
-                    ],
+                        const SizedBox(width: 12),
+                        if (chatState.isLoading)
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(primaryColor.withOpacity(0.8)),
+                              ),
+                            ),
+                          )
+                        else
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: primaryColor.withOpacity(0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
+                              onPressed: () {
+                                if (_textController.text.trim().isNotEmpty) {
+                                  ref.read(chatProvider.notifier).sendMessage(_textController.text);
+                                  _textController.clear();
+                                }
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

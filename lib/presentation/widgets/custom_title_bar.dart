@@ -22,12 +22,12 @@ class CustomTitleBar extends ConsumerWidget {
     final isSunset = themeMode == AuraThemeMode.sunset;
 
     return Container(
-      height: 50,
+      height: 54, // Slightly taller for a more premium feel
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withOpacity(0.03),
             width: 1,
           ),
         ),
@@ -41,7 +41,7 @@ class CustomTitleBar extends ConsumerWidget {
           
           Row(
             children: [
-              const SizedBox(width: 20),
+              const SizedBox(width: 24),
               if (showBackButton)
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Colors.white70),
@@ -49,22 +49,29 @@ class CustomTitleBar extends ConsumerWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
-              if (showBackButton) const SizedBox(width: 12),
+              if (showBackButton) const SizedBox(width: 16),
               
               // Branding
-              Icon(
-                isAura || isSunset ? Icons.auto_awesome_rounded : Icons.music_note_rounded,
-                size: 20, 
-                color: AppTheme.getPrimary(themeMode),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.getPrimary(themeMode).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isAura || isSunset ? Icons.auto_awesome_rounded : Icons.music_note_rounded,
+                  size: 18, 
+                  color: AppTheme.getPrimary(themeMode),
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Text(
                 "AuraBeats",
                 style: GoogleFonts.outfit(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white,
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  letterSpacing: -0.5,
+                  fontSize: 17,
+                  letterSpacing: -0.8,
                 ),
               ),
               
@@ -74,68 +81,78 @@ class CustomTitleBar extends ConsumerWidget {
               PopupMenuButton<AuraThemeMode>(
                 icon: Icon(
                   isAura ? Icons.palette_outlined : Icons.palette_rounded,
-                  size: 16,
-                  color: Colors.white70,
+                  size: 18,
+                  color: Colors.white.withOpacity(0.6),
                 ),
                 tooltip: 'Select Theme',
-                offset: const Offset(0, 40),
-                color: AppTheme.getSurface(themeMode),
+                offset: const Offset(0, 44),
+                elevation: 0,
+                color: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                onSelected: (AuraThemeMode mode) {
-                  ref.read(themeProvider.notifier).setTheme(mode);
-                },
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: AuraThemeMode.aura,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.auraPrimary),
-                        const SizedBox(width: 12),
-                        Text('Aura Theme', style: GoogleFonts.outfit(fontSize: 14)),
-                      ],
+                    child: GlassContainer(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.auraPrimary),
+                          const SizedBox(width: 12),
+                          Text('Aura', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
                     ),
                   ),
                   PopupMenuItem(
                     value: AuraThemeMode.spotify,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.music_note_rounded, size: 18, color: AppTheme.spotifyPrimary),
-                        const SizedBox(width: 12),
-                        Text('Spotify Theme', style: GoogleFonts.outfit(fontSize: 14)),
-                      ],
+                    child: GlassContainer(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.music_note_rounded, size: 18, color: AppTheme.spotifyPrimary),
+                          const SizedBox(width: 12),
+                          Text('Spotify', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
                     ),
                   ),
                   PopupMenuItem(
                     value: AuraThemeMode.sunset,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.wb_sunny_rounded, size: 18, color: AppTheme.sunsetPrimary),
-                        const SizedBox(width: 12),
-                        Text('Sunset Theme', style: GoogleFonts.outfit(fontSize: 14)),
-                      ],
+                    child: GlassContainer(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.wb_sunny_rounded, size: 18, color: AppTheme.sunsetPrimary),
+                          const SizedBox(width: 12),
+                          Text('Sunset', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
                     ),
                   ),
                 ],
+                onSelected: (mode) => ref.read(themeProvider.notifier).setTheme(mode),
               ),
 
               if (actions != null) ...actions!,
               
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               
               // Window Controls
               _TitleBarButton(
-                icon: Icons.remove,
+                icon: Icons.minimize_rounded,
                 onPressed: () => windowManager.minimize(),
               ),
               _TitleBarButton(
-                icon: Icons.close,
+                icon: Icons.close_rounded,
                 isClose: true,
                 onPressed: () => windowManager.close(),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
             ],
           ),
         ],
