@@ -94,9 +94,12 @@ class CustomTitleBar extends ConsumerWidget {
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: AuraThemeMode.aura,
-                    child: GlassContainer(
+                    child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      borderRadius: BorderRadius.circular(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.auraPrimary),
@@ -108,9 +111,12 @@ class CustomTitleBar extends ConsumerWidget {
                   ),
                   PopupMenuItem(
                     value: AuraThemeMode.spotify,
-                    child: GlassContainer(
+                    child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      borderRadius: BorderRadius.circular(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.music_note_rounded, size: 18, color: AppTheme.spotifyPrimary),
@@ -122,9 +128,12 @@ class CustomTitleBar extends ConsumerWidget {
                   ),
                   PopupMenuItem(
                     value: AuraThemeMode.sunset,
-                    child: GlassContainer(
+                    child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      borderRadius: BorderRadius.circular(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.wb_sunny_rounded, size: 18, color: AppTheme.sunsetPrimary),
