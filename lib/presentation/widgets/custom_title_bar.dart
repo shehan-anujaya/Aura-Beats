@@ -34,6 +34,11 @@ class CustomTitleBar extends ConsumerWidget {
       ),
       child: Stack(
         children: [
+          // Animated Background
+          Positioned.fill(
+            child: _AnimatedBackground(themeMode: themeMode),
+          ),
+          
           // Draggable Area
           const Positioned.fill(
             child: MoveWindow(),
@@ -205,6 +210,109 @@ class MoveWindow extends StatelessWidget {
         windowManager.startDragging();
       },
       child: Container(),
+    );
+  }
+}
+
+class _AnimatedBackground extends StatefulWidget {
+  final AuraThemeMode themeMode;
+
+  const _AnimatedBackground({required this.themeMode});
+
+  @override
+  State<_AnimatedBackground> createState() => _AnimatedBackgroundState();
+}
+
+class _AnimatedBackgroundState extends State<_AnimatedBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        final primaryColor = AppTheme.getPrimary(widget.themeMode);
+        
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                primaryColor.withOpacity(0.03 + (_animation.value * 0.02)),
+                Colors.transparent,
+                primaryColor.withOpacity(0.02 + ((1 - _animation.value) * 0.02)),
+              ],
+              stops: [
+                0.0,
+                0.3 + (_animation.value * 0.4),
+                1.0,
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              // Animated shimmer effect
+              Positioned(
+                left: -100 + (_animation.value * 200),
+                top: -20,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        primaryColor.withOpacity(0.08),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Secondary shimmer effect
+              Positioned(
+                right: -50 + ((1 - _animation.value) * 150),
+                top: -30,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        primaryColor.withOpacity(0.06),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
