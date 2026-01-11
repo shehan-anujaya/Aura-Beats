@@ -224,33 +224,80 @@ class _AnimatedBackground extends StatefulWidget {
 }
 
 class _AnimatedBackgroundState extends State<_AnimatedBackground>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+    with TickerProviderStateMixin {
+  late AnimationController _primaryController;
+  late AnimationController _secondaryController;
+  late AnimationController _pulseController;
+  late AnimationController _waveController;
+  
+  late Animation<double> _primaryAnimation;
+  late Animation<double> _secondaryAnimation;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _waveAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    
+    // Primary shimmer animation (8 seconds)
+    _primaryController = AnimationController(
       duration: const Duration(seconds: 8),
       vsync: this,
     )..repeat(reverse: true);
     
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    _primaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _primaryController, curve: Curves.easeInOut),
+    );
+    
+    // Secondary floating animation (12 seconds)
+    _secondaryController = AnimationController(
+      duration: const Duration(seconds: 12),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _secondaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _secondaryController, curve: Curves.easeInOutCubic),
+    );
+    
+    // Pulse animation (5 seconds)
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOutSine),
+    );
+    
+    // Wave animation (10 seconds)
+    _waveController = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    )..repeat();
+    
+    _waveAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _waveController, curve: Curves.linear),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _primaryController.dispose();
+    _secondaryController.dispose();
+    _pulseController.dispose();
+    _waveController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _animation,
+      animation: Listenable.merge([
+        _primaryAnimation,
+        _secondaryAnimation,
+        _pulseAnimation,
+        _waveAnimation,
+      ]),
       builder: (context, child) {
         final primaryColor = AppTheme.getPrimary(widget.themeMode);
         
@@ -260,52 +307,123 @@ class _AnimatedBackgroundState extends State<_AnimatedBackground>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                primaryColor.withOpacity(0.03 + (_animation.value * 0.02)),
+                primaryColor.withOpacity(0.02 + (_pulseAnimation.value * 0.03)),
                 Colors.transparent,
-                primaryColor.withOpacity(0.02 + ((1 - _animation.value) * 0.02)),
+                primaryColor.withOpacity(0.01 + ((1 - _pulseAnimation.value) * 0.02)),
               ],
               stops: [
                 0.0,
-                0.3 + (_animation.value * 0.4),
+                0.3 + (_waveAnimation.value * 0.4),
                 1.0,
               ],
             ),
           ),
           child: Stack(
             children: [
-              // Animated shimmer effect
+              // Floating orb 1 - Large shimmer
               Positioned(
-                left: -100 + (_animation.value * 200),
-                top: -20,
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        primaryColor.withOpacity(0.08),
-                        Colors.transparent,
-                      ],
+                left: -80 + (_primaryAnimation.value * 180),
+                top: -30 + (_secondaryAnimation.value * 20),
+                child: Transform.scale(
+                  scale: 0.9 + (_pulseAnimation.value * 0.2),
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          primaryColor.withOpacity(0.12 * (0.5 + _pulseAnimation.value * 0.5)),
+                          primaryColor.withOpacity(0.04),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
                     ),
                   ),
                 ),
               ),
-              // Secondary shimmer effect
+              
+              // Floating orb 2 - Medium right side
               Positioned(
-                right: -50 + ((1 - _animation.value) * 150),
-                top: -30,
+                right: -60 + ((1 - _primaryAnimation.value) * 140),
+                top: -20 + ((1 - _secondaryAnimation.value) * 15),
+                child: Transform.scale(
+                  scale: 0.85 + ((1 - _pulseAnimation.value) * 0.15),
+                  child: Container(
+                    width: 130,
+                    height: 130,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          primaryColor.withOpacity(0.10 * (0.6 + (1 - _pulseAnimation.value) * 0.4)),
+                          primaryColor.withOpacity(0.03),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Floating orb 3 - Small wanderer
+              Positioned(
+                left: 100 + (_secondaryAnimation.value * 80),
+                top: 10 + (_primaryAnimation.value * 25),
+                child: Transform.scale(
+                  scale: 0.7 + (_pulseAnimation.value * 0.3),
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          primaryColor.withOpacity(0.08 * _pulseAnimation.value),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.3, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Wave effect overlay
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _WavePainter(
+                    color: primaryColor,
+                    progress: _waveAnimation.value,
+                    opacity: 0.02 + (_pulseAnimation.value * 0.03),
+                  ),
+                ),
+              ),
+              
+              // Subtle scanline effect
+              Positioned(
+                left: -200,
+                right: -200,
+                top: -10 + (_primaryAnimation.value * 70),
                 child: Container(
-                  width: 120,
-                  height: 120,
+                  height: 2,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
+                    gradient: LinearGradient(
                       colors: [
-                        primaryColor.withOpacity(0.06),
+                        Colors.transparent,
+                        primaryColor.withOpacity(0.15 * _pulseAnimation.value),
                         Colors.transparent,
                       ],
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.2 * _pulseAnimation.value),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -315,4 +433,64 @@ class _AnimatedBackgroundState extends State<_AnimatedBackground>
       },
     );
   }
+}
+
+// Custom painter for wave effect
+class _WavePainter extends CustomPainter {
+  final Color color;
+  final double progress;
+  final double opacity;
+
+  _WavePainter({
+    required this.color,
+    required this.progress,
+    required this.opacity,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withOpacity(opacity)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final path = Path();
+    final waveHeight = 10.0;
+    final waveLength = size.width / 3;
+
+    path.moveTo(0, size.height / 2);
+
+    for (double x = 0; x <= size.width; x++) {
+      final y = size.height / 2 +
+          waveHeight * Math.sin((x / waveLength * 2 * Math.pi) + (progress * 2 * Math.pi));
+      path.lineTo(x, y);
+    }
+
+    canvas.drawPath(path, paint);
+    
+    // Draw second wave with offset
+    final path2 = Path();
+    path2.moveTo(0, size.height / 2 + 15);
+
+    for (double x = 0; x <= size.width; x++) {
+      final y = size.height / 2 + 15 +
+          waveHeight * 0.7 * Math.sin((x / waveLength * 2 * Math.pi) - (progress * 2 * Math.pi));
+      path2.lineTo(x, y);
+    }
+
+    canvas.drawPath(path2, paint..color = color.withOpacity(opacity * 0.6));
+  }
+
+  @override
+  bool shouldRepaint(_WavePainter oldDelegate) {
+    return oldDelegate.progress != progress || 
+           oldDelegate.opacity != opacity ||
+           oldDelegate.color != color;
+  }
+}
+
+// Math helper
+class Math {
+  static double sin(double x) => x.sin();
+  static double pi = 3.141592653589793;
 }
