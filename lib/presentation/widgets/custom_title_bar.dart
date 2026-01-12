@@ -492,6 +492,6 @@ class _WavePainter extends CustomPainter {
 
 // Math helper
 class Math {
-  static double sin(double x) => x.sin();
-  static double pi = 3.141592653589793;
+  static double sin(double x) => math.sin(x);
+  static double pi = math.pi;
 }
