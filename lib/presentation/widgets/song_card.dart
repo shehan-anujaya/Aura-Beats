@@ -25,6 +25,7 @@ class SongCard extends ConsumerStatefulWidget {
 class _SongCardState extends ConsumerState<SongCard> {
   bool _isDragging = false;
   double _dragValue = 0.0;
+  bool _favoriteAnimationTrigger = false;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +115,16 @@ class _SongCardState extends ConsumerState<SongCard> {
                     top: 14,
                     right: 14,
                     child: GestureDetector(
-                      onTap: () => ref.read(favoritesProvider.notifier).toggleFavorite(widget.song),
+                      onTap: () {
+                        final wasLiked = isLiked;
+                        ref.read(favoritesProvider.notifier).toggleFavorite(widget.song);
+                        if (!wasLiked) {
+                          setState(() => _favoriteAnimationTrigger = true);
+                          Future.delayed(const Duration(milliseconds: 600), () {
+                            if (mounted) setState(() => _favoriteAnimationTrigger = false);
+                          });
+                        }
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -126,7 +136,10 @@ class _SongCardState extends ConsumerState<SongCard> {
                           isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                           size: 16,
                           color: isLiked ? Colors.redAccent : Colors.white70,
-                        ),
+                        ).animate(target: _favoriteAnimationTrigger ? 1 : 0)
+                        .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 300.ms)
+                        .then()
+                        .scale(begin: const Offset(1.3, 1.3), end: const Offset(1, 1), duration: 300.ms),
                       ),
                     ),
                   ),
