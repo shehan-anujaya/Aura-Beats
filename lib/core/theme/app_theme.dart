@@ -51,6 +51,7 @@ class AppTheme {
       case AuraThemeMode.aura: return auraSurface;
       case AuraThemeMode.spotify: return spotifySurface;
       case AuraThemeMode.sunset: return sunsetSurface;
+      case AuraThemeMode.neon: return neonSurface;
     }
   }
 
@@ -74,7 +75,7 @@ class AppTheme {
         primary: primary,
         secondary: mode == AuraThemeMode.aura 
             ? auraAccent 
-            : (mode == AuraThemeMode.spotify ? spotifyAccent : sunsetAccent),
+            : (mode == AuraThemeMode.spotify ? spotifyAccent : (mode == AuraThemeMode.sunset ? sunsetAccent : neonAccent)),
         surface: surface,
         onSurface: Colors.white,
         background: background,
@@ -117,4 +118,4 @@ class AppTheme {
   }
 }
 
-enum AuraThemeMode { aura, spotify, sunset }
+enum AuraThemeMode { aura, spotify, sunset, neon }
