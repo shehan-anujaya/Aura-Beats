@@ -21,12 +21,19 @@ class AppTheme {
   static const Color sunsetSurface = Color(0xFF2D2424); // Warm Dark Grey
   static const Color sunsetAccent = Color(0xFFFFC107);
 
+  // Neon Theme Colors
+  static const Color neonPrimary = Color(0xFF00FFFF); // Cyan
+  static const Color neonBackground = Color(0xFF0D0D0D); // Very Dark Grey
+  static const Color neonSurface = Color(0xFF1A1A1A); // Dark Grey
+  static const Color neonAccent = Color(0xFFFF00FF); // Magenta
+
   // Theme-aware values
   static Color getPrimary(AuraThemeMode mode) {
     switch (mode) {
       case AuraThemeMode.aura: return auraPrimary;
       case AuraThemeMode.spotify: return spotifyPrimary;
       case AuraThemeMode.sunset: return sunsetPrimary;
+      case AuraThemeMode.neon: return neonPrimary;
     }
   }
 
@@ -35,6 +42,7 @@ class AppTheme {
       case AuraThemeMode.aura: return auraBackground;
       case AuraThemeMode.spotify: return spotifyBackground;
       case AuraThemeMode.sunset: return sunsetBackground;
+      case AuraThemeMode.neon: return neonBackground;
     }
   }
 
