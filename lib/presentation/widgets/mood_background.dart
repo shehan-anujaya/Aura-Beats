@@ -27,7 +27,7 @@ class MoodBackground extends ConsumerWidget {
     return Stack(
       children: [
         Positioned.fill(child: _BaseBackground(mood: mood, isPlaying: isPlaying, themeMode: themeMode)),
-        if (isPlaying && !isSpotify) Positioned.fill(child: _MoodOverlay(mood: mood)),
+        if (isPlaying && !isSpotify) RepaintBoundary(child: _MoodOverlay(mood: mood)),
         child,
       ],
     );
@@ -119,24 +119,26 @@ class ParticleEffect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: List.generate(20, (index) {
-        final random = math.Random();
-        final startX = random.nextDouble() * MediaQuery.of(context).size.width;
-        final delay = random.nextInt(3000).ms;
-        final duration = (4000 + random.nextInt(4000)).ms;
+    return RepaintBoundary(
+      child: Stack(
+        children: List.generate(12, (index) { // Reduced from 20 to 12
+          final random = math.Random(index); // Use index as seed for consistency
+          final startX = random.nextDouble() * MediaQuery.of(context).size.width;
+          final delay = random.nextInt(2000).ms; // Reduced delay range
+          final duration = (3000 + random.nextInt(2000)).ms; // Reduced duration range
 
-        return Positioned(
-          left: startX,
-          bottom: -100,
-          child: Icon(icon, color: color.withOpacity(0.5), size: 20 + random.nextDouble() * 40)
-              .animate(onPlay: (controller) => controller.repeat())
-              .moveY(begin: 0, end: -MediaQuery.of(context).size.height - 200, duration: duration, delay: delay, curve: Curves.easeInOut)
-              .fade(begin: 0, end: 1.0, duration: 1.seconds)
-              .then()
-              .fade(begin: 1.0, end: 0, duration: 1.seconds),
-        );
-      }),
+          return Positioned(
+            left: startX,
+            bottom: -50, // Reduced from -100
+            child: Icon(icon, color: color.withOpacity(0.4), size: 16 + random.nextDouble() * 24) // Smaller size range
+                .animate(onPlay: (controller) => controller.repeat())
+                .moveY(begin: 0, end: -MediaQuery.of(context).size.height - 100, duration: duration, delay: delay, curve: Curves.easeInOut)
+                .fade(begin: 0, end: 0.8, duration: 500.ms) // Faster fade in
+                .then()
+                .fade(begin: 0.8, end: 0, duration: 500.ms), // Faster fade out
+          );
+        }),
+      ),
     );
   }
 }

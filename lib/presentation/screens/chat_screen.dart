@@ -94,23 +94,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: color,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: color.withOpacity(0.5),
-                                  blurRadius: 4,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                           .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 1.seconds)
-                           .tint(color: color.withOpacity(0.8)),
+                          RepaintBoundary(
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: color,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: color.withOpacity(0.5),
+                                    blurRadius: 4,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                            ).animate(
+                              target: isConnected ? 1.0 : 0.0,
+                              onPlay: isConnected ? (controller) => controller.repeat(reverse: true) : null,
+                            ).scale(
+                              begin: const Offset(1, 1), 
+                              end: const Offset(1.3, 1.3), 
+                              duration: 1.seconds
+                            ).tint(color: color.withOpacity(0.8)),
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             isConnected ? "AURA ONLINE" : "AURA OFFLINE",

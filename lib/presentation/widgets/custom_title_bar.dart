@@ -226,11 +226,7 @@ class _AnimatedBackground extends StatefulWidget {
 
 class _AnimatedBackgroundState extends State<_AnimatedBackground>
     with TickerProviderStateMixin {
-  late AnimationController _primaryController;
-  late AnimationController _secondaryController;
-  late AnimationController _pulseController;
-  late AnimationController _waveController;
-  
+  late AnimationController _controller;
   late Animation<double> _primaryAnimation;
   late Animation<double> _secondaryAnimation;
   late Animation<double> _pulseAnimation;
@@ -240,198 +236,188 @@ class _AnimatedBackgroundState extends State<_AnimatedBackground>
   void initState() {
     super.initState();
     
-    // Primary shimmer animation (8 seconds)
-    _primaryController = AnimationController(
-      duration: const Duration(seconds: 8),
-      vsync: this,
-    )..repeat(reverse: true);
-    
-    _primaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _primaryController, curve: Curves.easeInOut),
-    );
-    
-    // Secondary floating animation (12 seconds)
-    _secondaryController = AnimationController(
+    // Single controller for all animations to reduce overhead
+    _controller = AnimationController(
       duration: const Duration(seconds: 12),
       vsync: this,
-    )..repeat(reverse: true);
+    )..repeat();
+
+    // Stagger animations to reduce simultaneous workload
+    _primaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.67, curve: Curves.easeInOut),
+      ),
+    );
     
     _secondaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _secondaryController, curve: Curves.easeInOutCubic),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.17, 0.84, curve: Curves.easeInOutCubic),
+      ),
     );
-    
-    // Pulse animation (5 seconds)
-    _pulseController = AnimationController(
-      duration: const Duration(seconds: 5),
-      vsync: this,
-    )..repeat(reverse: true);
     
     _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOutSine),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.33, 1.0, curve: Curves.easeInOutSine),
+      ),
     );
     
-    // Wave animation (10 seconds)
-    _waveController = AnimationController(
-      duration: const Duration(seconds: 10),
-      vsync: this,
-    )..repeat();
-    
     _waveAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _waveController, curve: Curves.linear),
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.linear,
+      ),
     );
   }
 
   @override
   void dispose() {
-    _primaryController.dispose();
-    _secondaryController.dispose();
-    _pulseController.dispose();
-    _waveController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _primaryAnimation,
-        _secondaryAnimation,
-        _pulseAnimation,
-        _waveAnimation,
-      ]),
-      builder: (context, child) {
-        final primaryColor = AppTheme.getPrimary(widget.themeMode);
-        
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                primaryColor.withOpacity(0.02 + (_pulseAnimation.value * 0.03)),
-                Colors.transparent,
-                primaryColor.withOpacity(0.01 + ((1 - _pulseAnimation.value) * 0.02)),
-              ],
-              stops: [
-                0.0,
-                0.3 + (_waveAnimation.value * 0.4),
-                1.0,
-              ],
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final primaryColor = AppTheme.getPrimary(widget.themeMode);
+          
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  primaryColor.withOpacity(0.02 + (_pulseAnimation.value * 0.03)),
+                  Colors.transparent,
+                  primaryColor.withOpacity(0.01 + ((1 - _pulseAnimation.value) * 0.02)),
+                ],
+                stops: [
+                  0.0,
+                  0.3 + (_waveAnimation.value * 0.4),
+                  1.0,
+                ],
+              ),
             ),
-          ),
-          child: Stack(
-            children: [
-              // Floating orb 1 - Large shimmer
-              Positioned(
-                left: -80 + (_primaryAnimation.value * 180),
-                top: -30 + (_secondaryAnimation.value * 20),
-                child: Transform.scale(
-                  scale: 0.9 + (_pulseAnimation.value * 0.2),
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          primaryColor.withOpacity(0.12 * (0.5 + _pulseAnimation.value * 0.5)),
-                          primaryColor.withOpacity(0.04),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.5, 1.0],
+            child: Stack(
+              children: [
+                // Floating orb 1 - Large shimmer
+                Positioned(
+                  left: -80 + (_primaryAnimation.value * 180),
+                  top: -30 + (_secondaryAnimation.value * 20),
+                  child: Transform.scale(
+                    scale: 0.9 + (_pulseAnimation.value * 0.2),
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            primaryColor.withOpacity(0.12 * (0.5 + _pulseAnimation.value * 0.5)),
+                            primaryColor.withOpacity(0.04),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              
-              // Floating orb 2 - Medium right side
-              Positioned(
-                right: -60 + ((1 - _primaryAnimation.value) * 140),
-                top: -20 + ((1 - _secondaryAnimation.value) * 15),
-                child: Transform.scale(
-                  scale: 0.85 + ((1 - _pulseAnimation.value) * 0.15),
-                  child: Container(
-                    width: 130,
-                    height: 130,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          primaryColor.withOpacity(0.10 * (0.6 + (1 - _pulseAnimation.value) * 0.4)),
-                          primaryColor.withOpacity(0.03),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.6, 1.0],
+                
+                // Floating orb 2 - Medium right side
+                Positioned(
+                  right: -60 + ((1 - _primaryAnimation.value) * 140),
+                  top: -20 + ((1 - _secondaryAnimation.value) * 15),
+                  child: Transform.scale(
+                    scale: 0.85 + ((1 - _pulseAnimation.value) * 0.15),
+                    child: Container(
+                      width: 130,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            primaryColor.withOpacity(0.10 * (0.6 + (1 - _pulseAnimation.value) * 0.4)),
+                            primaryColor.withOpacity(0.03),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.6, 1.0],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              
-              // Floating orb 3 - Small wanderer
-              Positioned(
-                left: 100 + (_secondaryAnimation.value * 80),
-                top: 10 + (_primaryAnimation.value * 25),
-                child: Transform.scale(
-                  scale: 0.7 + (_pulseAnimation.value * 0.3),
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          primaryColor.withOpacity(0.08 * _pulseAnimation.value),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.3, 1.0],
+                
+                // Floating orb 3 - Small wanderer
+                Positioned(
+                  left: 100 + (_secondaryAnimation.value * 80),
+                  top: 10 + (_primaryAnimation.value * 25),
+                  child: Transform.scale(
+                    scale: 0.7 + (_pulseAnimation.value * 0.3),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            primaryColor.withOpacity(0.08 * _pulseAnimation.value),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.3, 1.0],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              
-              // Wave effect overlay
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _WavePainter(
-                    color: primaryColor,
-                    progress: _waveAnimation.value,
-                    opacity: 0.02 + (_pulseAnimation.value * 0.03),
+                
+                // Wave effect overlay with RepaintBoundary
+                RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _WavePainter(
+                      color: primaryColor,
+                      progress: _waveAnimation.value,
+                      opacity: 0.02 + (_pulseAnimation.value * 0.03),
+                    ),
+                    child: const SizedBox.expand(),
                   ),
                 ),
-              ),
-              
-              // Subtle scanline effect
-              Positioned(
-                left: -200,
-                right: -200,
-                top: -10 + (_primaryAnimation.value * 70),
-                child: Container(
-                  height: 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        primaryColor.withOpacity(0.15 * _pulseAnimation.value),
-                        Colors.transparent,
+                
+                // Subtle scanline effect
+                Positioned(
+                  left: -200,
+                  right: -200,
+                  top: -10 + (_primaryAnimation.value * 70),
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          primaryColor.withOpacity(0.15 * _pulseAnimation.value),
+                          Colors.transparent,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withOpacity(0.2 * _pulseAnimation.value),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
                       ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.2 * _pulseAnimation.value),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
