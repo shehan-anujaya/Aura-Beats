@@ -148,31 +148,33 @@ class RainEffect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: List.generate(60, (index) {
-        final random = math.Random();
-        final startX = random.nextDouble() * MediaQuery.of(context).size.width;
-        final delay = random.nextInt(1000).ms;
-        final duration = (800 + random.nextInt(600)).ms;
+    return RepaintBoundary(
+      child: Stack(
+        children: List.generate(30, (index) { // Reduced from 60 to 30
+          final random = math.Random(index); // Use index as seed
+          final startX = random.nextDouble() * MediaQuery.of(context).size.width;
+          final delay = random.nextInt(800).ms; // Reduced delay
+          final duration = (600 + random.nextInt(400)).ms; // Reduced duration range
 
-        return Positioned(
-          left: startX,
-          top: -100,
-          child: Container(
-            width: 2,
-            height: 30 + random.nextDouble() * 50,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.blueAccent.withOpacity(0), Colors.blueAccent.withOpacity(0.6)],
+          return Positioned(
+            left: startX,
+            top: -50, // Reduced from -100
+            child: Container(
+              width: 1.5, // Slightly thinner
+              height: 20 + random.nextDouble() * 30, // Smaller height range
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.blueAccent.withOpacity(0), Colors.blueAccent.withOpacity(0.5)], // Reduced opacity
+                ),
               ),
-            ),
-          )
-              .animate(onPlay: (controller) => controller.repeat())
-              .moveY(begin: 0, end: MediaQuery.of(context).size.height + 250, duration: duration, delay: delay, curve: Curves.linear),
-        );
-      }),
+            )
+                .animate(onPlay: (controller) => controller.repeat())
+                .moveY(begin: 0, end: MediaQuery.of(context).size.height + 150, duration: duration, delay: delay, curve: Curves.linear),
+          );
+        }),
+      ),
     );
   }
 }
@@ -182,34 +184,36 @@ class CloudEffect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: List.generate(5, (index) {
-        final random = math.Random();
-        final startY = random.nextDouble() * MediaQuery.of(context).size.height;
-        final delay = random.nextInt(10000).ms;
-        final duration = (15000 + random.nextInt(15000)).ms;
+    return RepaintBoundary(
+      child: Stack(
+        children: List.generate(3, (index) { // Reduced from 5 to 3
+          final random = math.Random(index);
+          final startY = random.nextDouble() * MediaQuery.of(context).size.height;
+          final delay = random.nextInt(8000).ms; // Reduced delay range
+          final duration = (12000 + random.nextInt(8000)).ms; // Reduced duration range
 
-        return Positioned(
-          top: startY,
-          left: -300,
-          child: Container(
-            width: 200 + random.nextDouble() * 200,
-            height: 100 + random.nextDouble() * 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueGrey.withOpacity(0.1),
-                  blurRadius: 100,
-                  spreadRadius: 50,
-                ),
-              ],
-            ),
-          )
-              .animate(onPlay: (controller) => controller.repeat())
-              .moveX(begin: 0, end: MediaQuery.of(context).size.width + 600, duration: duration, delay: delay, curve: Curves.linear),
-        );
-      }),
+          return Positioned(
+            top: startY,
+            left: -200, // Reduced from -300
+            child: Container(
+              width: 150 + random.nextDouble() * 150, // Smaller width range
+              height: 75 + random.nextDouble() * 75, // Smaller height range
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueGrey.withOpacity(0.08), // Reduced opacity
+                    blurRadius: 80, // Reduced blur
+                    spreadRadius: 30, // Reduced spread
+                  ),
+                ],
+              ),
+            )
+                .animate(onPlay: (controller) => controller.repeat())
+                .moveX(begin: 0, end: MediaQuery.of(context).size.width + 400, duration: duration, delay: delay, curve: Curves.linear),
+          );
+        }),
+      ),
     );
   }
 }
@@ -219,23 +223,25 @@ class PulseEffect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 500,
-        height: 500,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [
-              Colors.orangeAccent.withOpacity(0.3),
-              Colors.redAccent.withOpacity(0.0),
-            ],
+    return RepaintBoundary(
+      child: Center(
+        child: Container(
+          width: 400, // Reduced from 500
+          height: 400, // Reduced from 500
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                Colors.orangeAccent.withOpacity(0.2), // Reduced opacity
+                Colors.redAccent.withOpacity(0.0),
+              ],
+            ),
           ),
-        ),
-      ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-       .scale(begin: const Offset(0.8, 0.8), end: const Offset(2.5, 2.5), duration: 1.2.seconds, curve: Curves.easeInOut)
-       .blur(begin: const Offset(40, 40), end: const Offset(150, 150))
-       .fade(begin: 0.1, end: 0.5),
+        ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+         .scale(begin: const Offset(0.9, 0.9), end: const Offset(2.0, 2.0), duration: 1.5.seconds, curve: Curves.easeInOut) // Slower and smaller scale
+         .blur(begin: const Offset(30, 30), end: const Offset(100, 100)) // Reduced blur range
+         .fade(begin: 0.05, end: 0.3), // Reduced opacity range
+      ),
     );
   }
 }
